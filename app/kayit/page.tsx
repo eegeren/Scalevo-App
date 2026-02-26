@@ -46,7 +46,7 @@ export default function KayitPage() {
       return;
     }
 
-    router.push("/");
+    router.push("/onboarding");
     router.refresh();
   };
 
