@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Package, Plus, Minus, Trash2, Edit3, Save, X, AlertTriangle,
-  Search, RefreshCw, CheckCircle2, ChevronDown, BarChart3, ArrowUp, ArrowDown
+  Search, RefreshCw, CheckCircle2, ChevronDown, BarChart3, ArrowUp, ArrowDown, Upload, Download
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,7 @@ export default function StokPage() {
   const [adjustId, setAdjustId] = useState<number | null>(null);
   const [adjustQty, setAdjustQty] = useState("1");
   const [toast, setToast] = useState<string | null>(null);
+  const [csvImporting, setCsvImporting] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -157,6 +158,51 @@ export default function StokPage() {
     await adjustStock(product, type === "in" ? qty : -qty);
   };
 
+  const exportCSV = () => {
+    const headers = ["Ad", "SKU", "Kategori", "Alış Fiyatı", "Satış Fiyatı", "Stok", "Min Stok", "Birim", "Notlar"];
+    const rows = products.map(p => [p.name, p.sku || "", p.category || "", p.purchase_price, p.sale_price, p.stock, p.min_stock, p.unit, p.notes || ""]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "stok-listesi.csv"; a.click();
+    URL.revokeObjectURL(url);
+    showToast("CSV indirildi ✓");
+  };
+
+  const importCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvImporting(true);
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter(Boolean);
+      const headers = lines[0].split(",").map(h => h.replace(/"/g, "").trim().toLowerCase());
+      const supabase = await getSupabase();
+      const { data: { user } } = await supabase.auth.getUser();
+      const rows = lines.slice(1).map(line => {
+        const vals = line.match(/(".*?"|[^,]+)/g)?.map(v => v.replace(/^"|"$/g, "").trim()) || [];
+        return {
+          user_id: user?.id,
+          name: vals[headers.indexOf("ad")] || vals[0] || "Ürün",
+          sku: vals[headers.indexOf("sku")] || vals[1] || "",
+          category: vals[headers.indexOf("kategori")] || vals[2] || "",
+          purchase_price: Number(vals[headers.indexOf("alış fiyatı")] || vals[3]) || 0,
+          sale_price: Number(vals[headers.indexOf("satış fiyatı")] || vals[4]) || 0,
+          stock: Number(vals[headers.indexOf("stok")] || vals[5]) || 0,
+          min_stock: Number(vals[headers.indexOf("min stok")] || vals[6]) || 5,
+          unit: vals[headers.indexOf("birim")] || vals[7] || "adet",
+          notes: vals[headers.indexOf("notlar")] || vals[8] || "",
+        };
+      }).filter(r => r.name);
+      if (rows.length > 0) {
+        await supabase.from("products").insert(rows);
+        await loadProducts();
+        showToast(`${rows.length} ürün içe aktarıldı ✓`);
+      }
+    } catch { showToast("CSV okunamadı. Format kontrol et."); }
+    finally { setCsvImporting(false); e.target.value = ""; }
+  };
+
   // Filtreleme
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -195,9 +241,20 @@ export default function StokPage() {
           <h2 className="text-3xl font-bold text-slate-900">Stok Yönetimi</h2>
           <p className="text-slate-500 mt-1">Ürünlerini ekle, stoklarını takip et.</p>
         </div>
-        <Button onClick={openAdd} className="bg-green-600 hover:bg-green-700 gap-2 shadow-sm">
-          <Plus size={16} /> Ürün Ekle
-        </Button>
+        <div className="flex gap-2">
+          <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm font-medium cursor-pointer hover:bg-slate-50 transition-colors ${csvImporting ? "opacity-50 pointer-events-none" : ""}`}>
+            <Upload size={14} /> {csvImporting ? "İçe aktarılıyor..." : "CSV İçe Aktar"}
+            <input type="file" accept=".csv" className="hidden" onChange={importCSV} />
+          </label>
+          {products.length > 0 && (
+            <Button onClick={exportCSV} variant="outline" className="border-slate-200 text-slate-600 gap-2">
+              <Download size={14} /> Dışa Aktar
+            </Button>
+          )}
+          <Button onClick={openAdd} className="bg-green-600 hover:bg-green-700 gap-2 shadow-sm">
+            <Plus size={16} /> Ürün Ekle
+          </Button>
+        </div>
       </div>
 
       {/* İstatistik Kartları */}
