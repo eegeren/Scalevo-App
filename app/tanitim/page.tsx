@@ -82,6 +82,57 @@ export default function TanitimPage() {
         </div>
       </section>
 
+      {/* RAKIP KARŞILAŞTIRMA */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-green-600 font-semibold text-sm uppercase tracking-wide mb-3">Neden Scalevo?</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Diğer araçlarla karşılaştır</h2>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left p-4 text-slate-500 font-semibold w-1/3">Özellik</th>
+                  <th className="p-4 text-center">
+                    <div className="inline-flex items-center gap-1.5 bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">
+                      ⚡ Scalevo
+                    </div>
+                  </th>
+                  <th className="p-4 text-center text-slate-400 font-semibold text-xs">Diğer Araçlar</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {[
+                  ["Ücretsiz başlangıç planı", true, false],
+                  ["AI ürün analizi & skor", true, false],
+                  ["Trendyol & HB entegrasyonu", true, "Kısıtlı"],
+                  ["Başlık & açıklama üretici (AI)", true, false],
+                  ["Rakip yorum analizi (AI)", true, false],
+                  ["Fiyat stratejisi asistanı (AI)", true, false],
+                  ["Trend keşfi", true, false],
+                  ["Aylık maliyet", "0₺ - 879₺", "500₺+"],
+                  ["Kurulum gerektirmez", true, false],
+                ].map(([feat, scalevo, other], i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+                    <td className="p-4 text-slate-700 font-medium">{feat}</td>
+                    <td className="p-4 text-center">
+                      {scalevo === true ? <span className="text-green-500 font-bold text-lg">✓</span> :
+                       <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full">{scalevo}</span>}
+                    </td>
+                    <td className="p-4 text-center">
+                      {other === false ? <span className="text-slate-300 font-bold text-lg">✗</span> :
+                       <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">{other}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-center text-xs text-slate-400 mt-4">* Genel pazar araştırmasına dayalı karşılaştırma</p>
+        </div>
+      </section>
+
       {/* ÖZELLİKLER */}
       <section id="ozellikler" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -230,6 +281,7 @@ export default function TanitimPage() {
           <div className="flex items-center gap-6 text-sm text-slate-400">
             <Link href="/giris" className="hover:text-slate-700 transition-colors">Giriş Yap</Link>
             <Link href="/kayit" className="hover:text-slate-700 transition-colors">Kayıt Ol</Link>
+            <Link href="/kvkk" className="hover:text-slate-700 transition-colors">KVKK & Gizlilik</Link>
           </div>
         </div>
       </footer>

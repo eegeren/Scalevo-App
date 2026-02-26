@@ -7,8 +7,21 @@ import { createClient } from "@/lib/supabase/server";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Scalevo",
-  description: "E-Ticaret Yönetim Paneli",
+  title: "Scalevo — AI Destekli E-Ticaret Paneli",
+  description: "Trendyol ve Hepsiburada satıcıları için yapay zeka destekli ürün analizi, sipariş ve stok yönetimi.",
+  manifest: "/manifest.json",
+  themeColor: "#16a34a",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Scalevo",
+  },
+  openGraph: {
+    title: "Scalevo — AI Destekli E-Ticaret Paneli",
+    description: "Trendyol ve Hepsiburada satıcıları için yapay zeka destekli yönetim paneli. Ücretsiz başla.",
+    type: "website",
+    locale: "tr_TR",
+  },
 };
 
 export default async function RootLayout({

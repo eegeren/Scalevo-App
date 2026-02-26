@@ -1,0 +1,43 @@
+{
+  "name": "Scalevo — AI E-Ticaret Paneli",
+  "short_name": "Scalevo",
+  "description": "Trendyol ve Hepsiburada satıcıları için yapay zeka destekli yönetim paneli",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait-primary",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Ürün Analiz Et",
+      "short_name": "Analiz",
+      "description": "Hızlı ürün analizi yap",
+      "url": "/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Siparişler",
+      "short_name": "Siparişler",
+      "description": "Siparişleri görüntüle",
+      "url": "/operasyonlar",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

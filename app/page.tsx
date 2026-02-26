@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BrainCircuit, AlertCircle, DollarSign, Package, TrendingUp, ShoppingBag, BarChart2, Clock,
-  ArrowUpRight, CheckCircle2, Truck
+  ArrowUpRight, CheckCircle2, Truck, Share2, Copy, Check
 } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +33,22 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const shareResult = () => {
+    if (!result) return;
+    const payload = {
+      urun: query, score: result.score, competition: result.competition,
+      priceRange: result.priceRange, shippingDifficulty: result.shippingDifficulty,
+      trend: result.trend, suggestion: result.suggestion,
+      date: new Date().toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }),
+    };
+    const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+    const url = `${window.location.origin}/paylasim?d=${encoded}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [stats, setStats] = useState({ analyses: 0, orders: 0, pendingOrders: 0, revenue: 0 });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
@@ -207,13 +223,22 @@ export default function Home() {
 
             <Card className="md:col-span-3 border-slate-200 bg-white shadow-sm border-l-4 border-l-green-500">
               <CardContent className="p-4 flex items-start gap-4">
-                <div className="p-2 bg-green-100 rounded-lg text-green-600 mt-1">
+                <div className="p-2 bg-green-100 rounded-lg text-green-600 mt-1 flex-shrink-0">
                   <BrainCircuit size={20} />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h5 className="font-semibold text-slate-800 mb-1">AI Tavsiyesi</h5>
                   <p className="text-slate-600 text-sm leading-relaxed">{result.suggestion}</p>
                 </div>
+                <button
+                  onClick={shareResult}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex-shrink-0 ${
+                    copied ? "bg-green-100 text-green-700" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                  }`}
+                  title="Paylaşım linkini kopyala"
+                >
+                  {copied ? <><Check size={13} /> Kopyalandı!</> : <><Share2 size={13} /> Paylaş</>}
+                </button>
               </CardContent>
             </Card>
           </div>
