@@ -20,15 +20,7 @@ interface Order {
   timestamp: number;
 }
 
-const DEMO_ORDERS: Order[] = [
-  { id: 1, code: "#2024192", customer: "Ahmet Yılmaz", item: "2 Adet Bebek Törpüsü", price: "1.250 ₺", priceNum: 1250, status: 'new', date: "10 dk önce", timestamp: Date.now() - 10 * 60000 },
-  { id: 2, code: "#2024292", customer: "Ayşe Demir", item: "1 Adet Bluetooth Bere", price: "450 ₺", priceNum: 450, status: 'new', date: "30 dk önce", timestamp: Date.now() - 30 * 60000 },
-  { id: 3, code: "#2024392", customer: "Mehmet Kaya", item: "3 Adet Kedi Su Pınarı", price: "2.100 ₺", priceNum: 2100, status: 'preparing', date: "1 saat önce", timestamp: Date.now() - 60 * 60000 },
-  { id: 4, code: "#2024395", customer: "Canan Erkin", item: "1 Adet Galaxy Projektör", price: "850 ₺", priceNum: 850, status: 'preparing', date: "2 saat önce", timestamp: Date.now() - 2 * 60 * 60000 },
-  { id: 5, code: "#2024401", customer: "Zeynep Şen", item: "1 Adet Projektör", price: "850 ₺", priceNum: 850, status: 'shipped', date: "Dün", timestamp: Date.now() - 28 * 60 * 60000 },
-  { id: 6, code: "#2024101", customer: "Burak Öz", item: "2 Adet Törpü", price: "1.100 ₺", priceNum: 1100, status: 'completed', date: "25 Ocak", timestamp: new Date("2026-01-25").getTime() },
-  { id: 7, code: "#2024098", customer: "Selin Yurt", item: "1 Adet Bere", price: "420 ₺", priceNum: 420, status: 'completed', date: "24 Ocak", timestamp: new Date("2026-01-24").getTime() },
-];
+
 
 export default function OperasyonlarPage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>('new');
@@ -46,27 +38,11 @@ export default function OperasyonlarPage() {
         .select("*")
         .order("timestamp", { ascending: false });
 
-      if (dbOrders && dbOrders.length > 0) {
-        setOrders(dbOrders.map(o => ({
-          id: o.id, code: o.code, customer: o.customer, item: o.item,
-          price: o.price, priceNum: o.price_num || 0,
-          status: o.status as OrderStatus, date: o.date, timestamp: o.timestamp,
-        })));
-      } else {
-        const demoData = DEMO_ORDERS.map(({ id: _id, ...o }) => ({
-          user_id: user.id, code: o.code, customer: o.customer, item: o.item,
-          price: o.price, price_num: o.priceNum, status: o.status,
-          date: o.date, timestamp: o.timestamp,
-        }));
-        const { data: inserted } = await supabase.from("orders").insert(demoData).select();
-        if (inserted) {
-          setOrders(inserted.map(o => ({
-            id: o.id, code: o.code, customer: o.customer, item: o.item,
-            price: o.price, priceNum: o.price_num || 0,
-            status: o.status as OrderStatus, date: o.date, timestamp: o.timestamp,
-          })));
-        }
-      }
+      setOrders((dbOrders || []).map(o => ({
+        id: o.id, code: o.code, customer: o.customer, item: o.item,
+        price: o.price, priceNum: o.price_num || 0,
+        status: o.status as OrderStatus, date: o.date, timestamp: o.timestamp,
+      })));
     };
     load();
   }, []);
