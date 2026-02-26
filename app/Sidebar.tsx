@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings
+  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -38,6 +38,7 @@ export default function Sidebar({ user }: SidebarProps) {
       <nav className="space-y-1.5 flex-1">
         <NavItem href="/" icon={<LayoutDashboard size={18} />} label="Genel Bakış" active={pathname === "/"} />
         <NavItem href="/analiz" icon={<Search size={18} />} label="Ürün Analiz & Skor" active={pathname.startsWith("/analiz")} />
+        <NavItem href="/ai-araclar" icon={<Sparkles size={18} />} label="AI Araçlar" active={pathname === "/ai-araclar"} badge="Yeni" />
         <NavItem href="/operasyonlar" icon={<ShoppingBag size={18} />} label="Operasyonlar" active={pathname === "/operasyonlar"} />
         <NavItem href="/finans" icon={<TrendingUp size={18} />} label="Finansal Durum" active={pathname === "/finans"} />
         <NavItem href="/pazaryerleri" icon={<Store size={18} />} label="Pazaryerleri" active={pathname === "/pazaryerleri"} badge="Yeni" />
