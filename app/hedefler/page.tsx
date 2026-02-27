@@ -1,4 +1,5 @@
-"use client";
+﻿"use client";
+import PlanGate from "@/components/PlanGate";
 
 import { useState, useEffect } from "react";
 import { Target, TrendingUp, ShoppingBag, BarChart3, Save, RefreshCw, CheckCircle2, Trophy, Flame } from "lucide-react";

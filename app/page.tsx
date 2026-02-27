@@ -134,7 +134,11 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Bir hata oluştu.");
+        if (data.limitReached) {
+          setError("⚠️ " + data.error);
+        } else {
+          setError(data.error || "Bir hata oluştu.");
+        }
       } else {
         setResult(data);
         try {
@@ -317,7 +321,14 @@ export default function Home() {
       </Card>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+        <div className={`p-4 rounded-lg text-sm flex items-start justify-between gap-3 ${error.includes('⚠️') ? 'bg-orange-50 border border-orange-200 text-orange-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+          <span>{error}</span>
+          {error.includes('⚠️') && (
+            <Link href="/upgrade" className="flex-shrink-0 text-xs font-bold bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors">
+              Pro&apos;ya Geç →
+            </Link>
+          )}
+        </div>
       )}
 
       {result && (

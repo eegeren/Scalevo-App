@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2, Crosshair
+  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2, Crosshair, Crown
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +19,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [storeName, setStoreName] = useState<string | null>(null);
+  const [planInfo, setPlanInfo] = useState<{ plan: string; analysisUsed: number } | null>(null);
 
   useEffect(() => {
     try {
@@ -28,6 +29,27 @@ export default function Sidebar({ user }: SidebarProps) {
         setStoreName(data.magazaAdi || null);
       }
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    const loadPlan = async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: sub } = await supabase.from("subscriptions").select("plan").eq("user_id", user.id).single();
+        const plan = sub?.plan || "free";
+        if (plan === "free") {
+          const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
+          const { count } = await supabase.from("analysis_history").select("*", { count: "exact", head: true }).gte("created_at", start.toISOString());
+          setPlanInfo({ plan, analysisUsed: count || 0 });
+        } else {
+          setPlanInfo({ plan, analysisUsed: 0 });
+        }
+      } catch {}
+    };
+    loadPlan();
   }, []);
 
   const handleLogout = async () => {
@@ -83,6 +105,34 @@ export default function Sidebar({ user }: SidebarProps) {
       </nav>
 
       <div className="mt-auto space-y-3">
+        {/* Plan bilgisi */}
+        {planInfo && (
+          planInfo.plan === "free" ? (
+            <Link href="/upgrade" className="block">
+              <div className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-400 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-green-700">Ücretsiz Plan</span>
+                  <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded-full font-bold">Pro&apos;ya Geç</span>
+                </div>
+                <div className="w-full bg-green-200 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-green-600 h-full rounded-full transition-all"
+                    style={{ width: `${Math.min((planInfo.analysisUsed / 20) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-green-600 mt-1">{planInfo.analysisUsed} / 20 analiz kullanıldı</p>
+              </div>
+            </Link>
+          ) : (
+            <div className="p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-200">
+              <div className="flex items-center gap-2">
+                <Crown size={14} className="text-amber-500" />
+                <span className="text-xs font-bold text-amber-700">Pro Plan — Aktif</span>
+              </div>
+            </div>
+          )
+        )}
+
         <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
           <div className="w-9 h-9 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-shrink-0">
             <User size={16} />

@@ -1,4 +1,5 @@
-"use client";
+﻿"use client";
+import PlanGate from "@/components/PlanGate";
 
 import { useState } from "react";
 import {

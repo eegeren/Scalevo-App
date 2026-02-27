@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { createClient } from "@/lib/supabase/server";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,6 +8,42 @@ const client = new OpenAI({
 
 export async function POST(req: NextRequest) {
   const { urun, kategori } = await req.json();
+
+  // Plan & limit kontrolü
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("plan")
+        .eq("user_id", user.id)
+        .single();
+
+      const isPro = sub?.plan === "pro";
+
+      if (!isPro) {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const { count } = await supabase
+          .from("analysis_history")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", startOfMonth.toISOString());
+
+        if ((count || 0) >= 20) {
+          return NextResponse.json(
+            { error: "Ücretsiz planın aylık 20 analiz hakkını doldurdun. Pro'ya geçerek sınırsız analiz yapabilirsin.", limitReached: true },
+            { status: 403 }
+          );
+        }
+      }
+    }
+  } catch {
+    // Hata olursa devam et (DB yoksa bloklanmasın)
+  }
 
   if (!urun) {
     return NextResponse.json({ error: "Ürün adı gerekli" }, { status: 400 });
