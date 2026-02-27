@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, ShoppingBag, Sparkles, Zap, Menu, X,
-  Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut
+  Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut, ShieldCheck
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,8 @@ const BOTTOM_NAV = [
   { href: "/operasyonlar", icon: ShoppingBag, label: "Siparişler" },
   { href: "/stok", icon: Boxes, label: "Stok" },
 ];
+
+const ADMIN_EMAILS_SHELL = ["egeevren@gmail.com", "admin@scalevo.com", "yusufege.erenn@gmail.com"];
 
 const DRAWER_NAV = [
   { href: "/", icon: LayoutDashboard, label: "Genel Bakış" },
@@ -95,7 +97,7 @@ export default function AppShell({ children, user }: AppShellProps) {
 
             {/* Nav Links */}
             <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
-              {DRAWER_NAV.map((item) => {
+              {[...DRAWER_NAV, ...(user && ADMIN_EMAILS_SHELL.includes(user.email?.toLowerCase()) ? [{ href: "/admin", icon: ShieldCheck, label: "Admin Paneli", badge: "Admin" }] : [])].map((item) => {
                 const active = item.href === "/"
                   ? pathname === "/"
                   : pathname.startsWith(item.href);

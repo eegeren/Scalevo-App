@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   Users, Search, StickyNote, ShoppingBag, TrendingUp,
-  ChevronRight, X, Plus, Save, RefreshCw, CheckCircle2, MessageSquare
+  ChevronRight, X, Plus, Save, RefreshCw, CheckCircle2, MessageSquare, Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -136,6 +136,17 @@ export default function MusterilerPage() {
     showToast("Not silindi.");
   };
 
+  const deleteCustomer = async (customerName: string) => {
+    if (!confirm(`"${customerName}" müşterisini ve tüm sipariş geçmişini silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)) return;
+    const supabase = await getSupabase();
+    await supabase.from("orders").delete().eq("customer", customerName);
+    await supabase.from("customer_notes").delete().eq("customer_name", customerName);
+    setOrders(prev => prev.filter(o => o.customer !== customerName));
+    setNotes(prev => prev.filter(n => n.customer_name !== customerName));
+    setSelected(null);
+    showToast(`"${customerName}" silindi.`);
+  };
+
   // İstatistikler
   const totalCustomers = customers.length;
   const repeatCustomers = customers.filter(c => c.orders.length > 1).length;
@@ -226,6 +237,13 @@ export default function MusterilerPage() {
                           {customer.notes.length > 0 && (
                             <span className="text-xs bg-blue-100 text-blue-600 rounded-full px-1.5 py-0.5 font-medium">{customer.notes.length}</span>
                           )}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); deleteCustomer(customer.name); }}
+                            className="p-1 rounded hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                            title="Müşteriyi sil"
+                          >
+                            <Trash2 size={12} />
+                          </button>
                           <ChevronRight size={14} />
                         </div>
                       </div>
@@ -242,9 +260,18 @@ export default function MusterilerPage() {
           <div className="flex-1 md:max-w-sm space-y-4 animate-in slide-in-from-right-4 duration-300">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-slate-900 text-lg">{selected.name}</h3>
-              <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400">
-                <X size={16} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => deleteCustomer(selected.name)}
+                  className="p-1.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-colors"
+                  title="Müşteriyi sil"
+                >
+                  <Trash2 size={15} />
+                </button>
+                <button onClick={() => setSelected(null)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400">
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Özet */}

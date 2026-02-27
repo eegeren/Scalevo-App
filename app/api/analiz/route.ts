@@ -6,23 +6,27 @@ const client = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
-  const { urun } = await req.json();
+  const { urun, kategori } = await req.json();
 
   if (!urun) {
     return NextResponse.json({ error: "Ürün adı gerekli" }, { status: 400 });
   }
 
-  const prompt = `Sen bir e-ticaret danışmanısın. Kullanıcının sattığı ürün: "${urun}"
+  const kategoriMetni = kategori ? ` (Kategori: ${kategori})` : "";
+
+  const prompt = `Sen bir Türk e-ticaret danışmanısın. Kullanıcının sattığı ürün: "${urun}"${kategoriMetni}
+
+Ürünü bu kategoride değerlendir. Fiyatlar Türkiye pazarına ve güncel piyasaya uygun olmalı.
 
 Aşağıdaki bilgileri JSON formatında döndür (başka hiçbir şey yazma, sadece JSON):
 {
-  "score": <0-100 arası satılabilirlik skoru, sayı>,
-  "competition": <"Düşük", "Orta" veya "Yüksek">,
-  "priceMin": <Türk pazarında tahmini minimum satış fiyatı, sadece sayı>,
-  "priceMax": <Türk pazarında tahmini maksimum satış fiyatı, sadece sayı>,
-  "shippingDifficulty": <"Kolay", "Orta" veya "Zor">,
-  "trend": <"Yükselen Trend 🔥" veya "Evergreen (Daimi) 🌲">,
-  "suggestion": <Bu ürün için 2-3 cümlelik Türkçe satış tavsiyesi>
+  "score": <Bu spesifik ürün için 0-100 arası satılabilirlik skoru — rekabet, talep ve kâr marjını göz önünde bulundur, sayı>,
+  "competition": <"Düşük", "Orta" veya "Yüksek" — bu kategorideki gerçek rekabet yoğunluğuna göre>,
+  "priceMin": <Trendyol/Hepsiburada'da bu ürünün gerçekçi minimum satış fiyatı (TL), sadece sayı>,
+  "priceMax": <Trendyol/Hepsiburada'da bu ürünün gerçekçi maksimum satış fiyatı (TL), sadece sayı>,
+  "shippingDifficulty": <"Kolay", "Orta" veya "Zor" — ürünün boyutu/kırılganlığına göre>,
+  "trend": <"Yükselen Trend 🔥" veya "Evergreen (Daimi) 🌲" — bu kategoride>,
+  "suggestion": <Bu ürün ve kategori için 2-3 cümlelik özgün, spesifik Türkçe satış tavsiyesi. Genel tavsiyelerden kaçın.>
 }`;
 
   try {

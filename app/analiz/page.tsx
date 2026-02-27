@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowUpRight, Filter, BarChart2, TrendingUp, Star, AlertTriangle } from "lucide-react";
+import { Search, ArrowUpRight, Filter, BarChart2, TrendingUp, Star, AlertTriangle, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface HistoryItem {
+  id: number;
   name: string;
   score: number;
   date: string;
@@ -20,6 +21,9 @@ export default function AnalizPage() {
   const router = useRouter();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [search, setSearch] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
 
   useEffect(() => {
     const load = async () => {
@@ -32,6 +36,7 @@ export default function AnalizPage() {
 
       setHistory(
         (data || []).map(item => ({
+          id: item.id,
           name: item.product_name,
           score: item.score,
           date: new Date(item.created_at).toLocaleString("tr-TR", {
@@ -44,6 +49,16 @@ export default function AnalizPage() {
     };
     load();
   }, []);
+
+  const deleteAnalysis = async (id: number, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`"${name}" analizini silmek istediğinize emin misiniz?`)) return;
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    await supabase.from("analysis_history").delete().eq("id", id);
+    setHistory(prev => prev.filter(h => h.id !== id));
+    showToast(`"${name}" silindi.`);
+  };
 
   const filtered = history.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
@@ -60,6 +75,13 @@ export default function AnalizPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium bg-green-600 text-white flex items-center gap-2 animate-in slide-in-from-top-4">
+          <CheckCircle2 size={15} /> {toast}
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold text-slate-800">Analiz Geçmişi</h2>
@@ -74,45 +96,34 @@ export default function AnalizPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2.5 bg-green-50 rounded-xl">
-              <BarChart2 size={18} className="text-green-600" />
-            </div>
+            <div className="p-2.5 bg-green-50 rounded-xl"><BarChart2 size={18} className="text-green-600" /></div>
             <div>
               <p className="text-xs text-slate-500 font-medium">Toplam Analiz</p>
               <p className="text-2xl font-bold text-slate-800">{history.length}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2.5 bg-blue-50 rounded-xl">
-              <TrendingUp size={18} className="text-blue-600" />
-            </div>
+            <div className="p-2.5 bg-blue-50 rounded-xl"><TrendingUp size={18} className="text-blue-600" /></div>
             <div>
               <p className="text-xs text-slate-500 font-medium">Ort. Skor</p>
               <p className="text-2xl font-bold text-slate-800">{avgScore || "—"}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-50 rounded-xl">
-              <Star size={18} className="text-emerald-600" />
-            </div>
+            <div className="p-2.5 bg-emerald-50 rounded-xl"><Star size={18} className="text-emerald-600" /></div>
             <div>
               <p className="text-xs text-slate-500 font-medium">Yüksek Pot.</p>
               <p className="text-2xl font-bold text-slate-800">{highPotential}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2.5 bg-red-50 rounded-xl">
-              <AlertTriangle size={18} className="text-red-500" />
-            </div>
+            <div className="p-2.5 bg-red-50 rounded-xl"><AlertTriangle size={18} className="text-red-500" /></div>
             <div>
               <p className="text-xs text-slate-500 font-medium">Düşük Pot.</p>
               <p className="text-2xl font-bold text-slate-800">{lowPotential}</p>
@@ -159,12 +170,12 @@ export default function AnalizPage() {
             <div>
               {filtered.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.id}
                   onClick={() => handleRowClick(item.name)}
                   className="flex items-center justify-between p-4 hover:bg-green-50 transition-colors cursor-pointer group rounded-xl border-b border-slate-50 last:border-0"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm ${
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 ${
                       item.score >= 75 ? 'bg-green-100 text-green-700' :
                       item.score >= 50 ? 'bg-orange-100 text-orange-700' :
                       'bg-red-100 text-red-600'
@@ -176,7 +187,7 @@ export default function AnalizPage() {
                       <p className="text-xs text-slate-500 mt-0.5">{item.date}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <Badge variant="secondary" className={`text-xs font-medium border-0 ${
                       item.score >= 75 ? 'bg-green-100 text-green-700' :
                       item.score >= 50 ? 'bg-orange-100 text-orange-700' :
@@ -184,7 +195,14 @@ export default function AnalizPage() {
                     }`}>
                       {item.status}
                     </Badge>
-                    <ArrowUpRight size={18} className="text-slate-300 group-hover:text-green-600 transition-colors" />
+                    <button
+                      onClick={(e) => deleteAnalysis(item.id, item.name, e)}
+                      className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                      title="Analizi sil"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                    <ArrowUpRight size={18} className="text-slate-300 group-hover:text-green-600 transition-colors flex-shrink-0" />
                   </div>
                 </div>
               ))}

@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cmd.exe /c \"npm install openai\")"
+      "Bash(cmd.exe /c \"npm install openai\")",
+      "Bash(ls /c/Users/egeev/OneDrive/Desktop/Scalevo-App-main/app/analiz/[urunId]/)",
+      "Bash(git init)",
+      "Bash(git remote add origin https://github.com/eegeren/Scalevo-App.git)",
+      "Bash(git fetch origin)",
+      "Bash(git checkout -b main)",
+      "Bash(git reset --soft origin/main)",
+      "Bash(git reset origin/main)",
+      "Bash(git add \"app/analiz/[urunId]/page.tsx\")",
+      "Bash(git commit:*)",
+      "Bash(git push origin main)",
+      "Bash(ls -la /c/Users/egeev/OneDrive/Desktop/Scalevo-App-main/*.sql)",
+      "Bash(xargs cat)",
+      "Bash(ls \"C:\\\\Users\\\\egeev\\\\OneDrive\\\\Desktop\\\\Scalevo-App-main\\\\app\\\\api\"\" 2>/dev/null || dir \"C:UsersegeevOneDriveDesktopScalevo-App-mainappapi \")"
     ]
   }
 }

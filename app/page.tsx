@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BrainCircuit, AlertCircle, DollarSign, Package, TrendingUp, ShoppingBag, BarChart2, Clock,
-  ArrowUpRight, CheckCircle2, Truck, Share2, Copy, Check
+  ArrowUpRight, CheckCircle2, Truck, Share2, Copy, Check, Rocket, Store, RefreshCw
 } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import SifirdanWizard from "./SifirdanWizard"
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -28,12 +29,25 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   completed: { label: "Tamamlandı", color: "bg-slate-100 text-slate-600" },
 };
 
+const KATEGORILER = [
+  { id: "elektronik",    label: "📱 Elektronik",       ornekler: ["Bluetooth Kulaklık", "Powerbank", "USB Hub", "Şarj Standı"] },
+  { id: "giyim",         label: "👗 Giyim",             ornekler: ["Oversize Tişört", "Keten Pantolon", "Kaban", "Bere"] },
+  { id: "ev-yasam",      label: "🏠 Ev & Yaşam",        ornekler: ["Bambu Kesme Tahtası", "Mum Seti", "Yastık Kılıfı", "Ahşap Kaşık"] },
+  { id: "evcil-hayvan",  label: "🐾 Evcil Hayvan",      ornekler: ["Kedi Su Pınarı", "Köpek Tasması", "Mama Kabı", "Kedi Tarağı"] },
+  { id: "bebek-cocuk",   label: "👶 Bebek & Çocuk",     ornekler: ["Bebek Bezi", "Diş Kaşıyıcı", "Uyku Tulumu", "Oyuncak"] },
+  { id: "spor",          label: "🏋️ Spor",              ornekler: ["Yoga Matı", "Direnç Bandı", "Protein Shaker", "Koşu Çorabı"] },
+  { id: "kozmetik",      label: "💄 Kozmetik",          ornekler: ["Saç Serumu", "Yüz Maskesi", "Dudak Balmı", "Nemlendirici"] },
+  { id: "gida",          label: "🍎 Gıda",              ornekler: ["Çiğ Badem", "Granola", "Organik Zeytinyağı", "Protein Bar"] },
+];
+
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [kategori, setKategori] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const shareResult = () => {
     if (!result) return;
@@ -53,6 +67,14 @@ export default function Home() {
   const [stats, setStats] = useState({ analyses: 0, orders: 0, pendingOrders: 0, revenue: 0 });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
+  const [storeInfo, setStoreInfo] = useState<{ magazaAdi: string; nis: string; platform: string; slogan?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("scalevo_store");
+      if (stored) setStoreInfo(JSON.parse(stored));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -92,7 +114,7 @@ export default function Home() {
       const res = await fetch("/api/analiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urun: query }),
+        body: JSON.stringify({ urun: query, kategori: kategori || undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -128,6 +150,13 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
+      {wizardOpen && (
+        <SifirdanWizard
+          onClose={() => setWizardOpen(false)}
+          onStoreSetup={(data) => setStoreInfo(data)}
+        />
+      )}
+
       {/* KİŞİSELLEŞTİRİLMİŞ HEADER */}
       <header className="flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -141,6 +170,21 @@ export default function Home() {
             <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
               {user ? user.name.split(" ")[0] : "Hoş Geldin"} 👋
             </h2>
+            {storeInfo && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <Store size={13} className="text-green-600 flex-shrink-0" />
+                <span className="text-sm font-semibold text-green-700">{storeInfo.magazaAdi}</span>
+                {storeInfo.platform === "trendyol" && (
+                  <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium">Trendyol</span>
+                )}
+                {storeInfo.platform === "hepsiburada" && (
+                  <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full font-medium">Hepsiburada</span>
+                )}
+                {storeInfo.platform === "her_ikisi" && (
+                  <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-medium">2 Platform</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="text-right hidden md:block">
@@ -150,6 +194,38 @@ export default function Home() {
           <p className="text-sm text-slate-500 mt-0.5">Panelin seni bekliyor.</p>
         </div>
       </header>
+
+      {/* 0'DAN BAŞLAT BANNER — sadece mağaza kurulmamışsa göster */}
+      {!storeInfo && <div
+        className="relative overflow-hidden rounded-2xl p-5 md:p-6 cursor-pointer group"
+        style={{ background: "linear-gradient(135deg, #16a34a 0%, #0d9488 60%, #0891b2 100%)" }}
+        onClick={() => setWizardOpen(true)}
+      >
+        {/* Dekoratif daireler */}
+        <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
+        <div className="absolute -right-4 top-8 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
+        <div className="absolute right-24 -bottom-6 w-20 h-20 rounded-full bg-white/5 pointer-events-none" />
+
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+              <Rocket size={24} className="text-white" />
+            </div>
+            <div>
+              <p className="text-white/80 text-xs font-medium mb-0.5">Yeni başlıyor musun?</p>
+              <h3 className="text-white font-black text-lg md:text-xl leading-tight">0&apos;dan Mağaza Kur 🚀</h3>
+              <p className="text-white/70 text-xs mt-0.5 hidden sm:block">
+                Niş · Ürün · Logo · Reklam Metni — hepsi AI ile 2 dakikada
+              </p>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <div className="bg-white text-green-700 font-bold text-sm px-4 py-2.5 rounded-xl shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-200 flex items-center gap-2">
+              Başlat <ArrowUpRight size={15} />
+            </div>
+          </div>
+        </div>
+      </div>}
 
       {/* HIZLI İSTATİSTİK KARTLARI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -163,12 +239,49 @@ export default function Home() {
       <Card className="border-slate-200 shadow-sm overflow-hidden">
         <div className="h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-400"></div>
         <CardContent className="p-5 md:p-8">
-          <div className="max-w-2xl mx-auto text-center space-y-4 md:space-y-6">
+          <div className="max-w-2xl mx-auto text-center space-y-4 md:space-y-5">
             <h4 className="text-xl md:text-2xl font-semibold text-slate-700">Ürün Fikri Doğrulama</h4>
-            <p className="text-slate-500 text-sm md:text-base">Ürün adını gir, potansiyelini yapay zeka ile ölçelim.</p>
+            <p className="text-slate-500 text-sm md:text-base">Kategori seç, ürün adını gir — AI ile potansiyelini ölç.</p>
+
+            {/* Kategori Seçici */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              {KATEGORILER.map(k => (
+                <button
+                  key={k.id}
+                  onClick={() => { setKategori(k.id === kategori ? "" : k.id); setQuery(""); setResult(null); }}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                    kategori === k.id
+                      ? "bg-green-600 text-white border-green-600 shadow-sm"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-green-400 hover:text-green-700"
+                  }`}
+                >
+                  {k.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Kategori örnekleri */}
+            {kategori && (
+              <div className="flex flex-wrap gap-1.5 justify-center">
+                {KATEGORILER.find(k => k.id === kategori)?.ornekler.map(ornek => (
+                  <button
+                    key={ornek}
+                    onClick={() => { setQuery(ornek); setResult(null); }}
+                    className="text-xs text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-2.5 py-1 rounded-lg transition-colors"
+                  >
+                    {ornek}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto">
               <Input
-                placeholder="Örn: Kedi Su Pınarı"
+                placeholder={
+                  kategori
+                    ? `Örn: ${KATEGORILER.find(k => k.id === kategori)?.ornekler[0] ?? "Ürün adı"}`
+                    : "Önce kategori seç veya direkt ürün yaz..."
+                }
                 className="h-11 md:h-12 text-base px-4 border-slate-200 focus-visible:ring-green-500 shadow-sm flex-1"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -178,7 +291,7 @@ export default function Home() {
                 size="lg"
                 className="h-11 md:h-12 px-6 bg-green-600 hover:bg-green-700 font-medium w-full sm:w-auto"
                 onClick={handleAnalyze}
-                disabled={loading}
+                disabled={loading || !query}
               >
                 {loading ? "Hesaplanıyor..." : "Analiz Et"}
               </Button>

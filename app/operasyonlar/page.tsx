@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, CheckCircle, Clock, Check, Box, Archive, RotateCcw } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, Check, Box, Archive, RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type OrderStatus = 'new' | 'preparing' | 'shipped' | 'completed' | 'returned';
@@ -52,6 +52,14 @@ export default function OperasyonlarPage() {
     const supabase = createClient();
     await supabase.from("orders").update({ status: newStatus }).eq("id", id);
     setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order));
+  };
+
+  const deleteOrder = async (id: number, code: string) => {
+    if (!confirm(`"${code}" siparişini silmek istediğinize emin misiniz?`)) return;
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    await supabase.from("orders").delete().eq("id", id);
+    setOrders(orders.filter(o => o.id !== id));
   };
 
   const stats = {
@@ -121,7 +129,7 @@ export default function OperasyonlarPage() {
                     </div>
                   </div>
 
-                  <div className="text-right flex items-center gap-6">
+                  <div className="text-right flex items-center gap-3">
                     <p className="font-bold text-slate-900 text-lg">{order.price}</p>
 
                     {order.status === 'new' && (
@@ -150,6 +158,13 @@ export default function OperasyonlarPage() {
                     {order.status === 'returned' && (
                       <span className="text-xs font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100">↩️ İade Edildi</span>
                     )}
+                    <button
+                      onClick={() => deleteOrder(order.id, order.code)}
+                      className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                      title="Siparişi sil"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </div>
               ))

@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target
+  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+
+const ADMIN_EMAILS = ["egeevren@gmail.com", "admin@scalevo.com", "yusufege.erenn@gmail.com"];
 
 interface SidebarProps {
   user: { name: string; email: string } | null;
@@ -15,6 +18,17 @@ interface SidebarProps {
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [storeName, setStoreName] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("scalevo_store");
+      if (stored) {
+        const data = JSON.parse(stored);
+        setStoreName(data.magazaAdi || null);
+      }
+    } catch {}
+  }, []);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -26,12 +40,16 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside className="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col p-6 shadow-sm sticky top-0 h-screen">
       <div className="flex items-center gap-3 mb-10 px-2">
-        <div className="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-sm">
+        <div className="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
           <Zap size={22} />
         </div>
-        <div>
+        <div className="min-w-0">
           <h1 className="font-bold text-lg text-slate-900 tracking-tight">Scalevo</h1>
-          <p className="text-xs text-slate-500 font-medium">Yönetim Paneli</p>
+          {storeName ? (
+            <p className="text-xs text-green-600 font-semibold truncate">🏪 {storeName}</p>
+          ) : (
+            <p className="text-xs text-slate-500 font-medium">Yönetim Paneli</p>
+          )}
         </div>
       </div>
 
@@ -46,10 +64,21 @@ export default function Sidebar({ user }: SidebarProps) {
         <NavItem href="/hedefler" icon={<Target size={18} />} label="Hedefler & KPI" active={pathname === "/hedefler"} />
         <NavItem href="/finans" icon={<TrendingUp size={18} />} label="Finansal Durum" active={pathname === "/finans"} />
         <NavItem href="/pazaryerleri" icon={<Store size={18} />} label="Pazaryerleri" active={pathname === "/pazaryerleri"} badge="Yeni" />
+        {storeName && (
+          <NavItem href="/magazam" icon={<Building2 size={18} />} label="Mağazam" active={pathname === "/magazam"} />
+        )}
 
         <div className="border-t border-slate-100 my-2" />
 
         <NavItem href="/ayarlar" icon={<Settings size={18} />} label="Ayarlar" active={pathname === "/ayarlar"} />
+
+        {/* Admin linki — sadece yetkili e-postalar */}
+        {user && ADMIN_EMAILS.includes(user.email?.toLowerCase()) && (
+          <>
+            <div className="border-t border-slate-100 my-2" />
+            <NavItem href="/admin" icon={<ShieldCheck size={18} />} label="Admin Paneli" active={pathname === "/admin"} badge="Admin" />
+          </>
+        )}
       </nav>
 
       <div className="mt-auto space-y-3">

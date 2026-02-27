@@ -2,12 +2,18 @@ import Link from "next/link";
 import {
   Zap, BarChart2, ShoppingBag, TrendingUp, BrainCircuit,
   CheckCircle, ArrowRight, Package, Star, Sparkles, Store,
-  Users, MessageSquare, ChevronDown, Shield, Clock, Boxes
+  Users, ChevronDown, Shield, Clock, Boxes, Rocket, Palette
 } from "lucide-react";
 
 export default function TanitimPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
+
+      {/* YENİLİKLER ÇUBUĞU */}
+      <div className="bg-green-600 text-white text-xs font-medium text-center py-2 px-4">
+        🚀 Yeni: <span className="font-bold">0'dan Mağaza Kur</span> — Niş seç, ürün ara, AI logo & slogan oluştur, ilk reklamını yaz. Hepsi 2 dakikada.
+        <Link href="/kayit" className="ml-2 underline underline-offset-2 font-bold hover:opacity-80">Dene →</Link>
+      </div>
 
       {/* NAVBAR */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
@@ -20,7 +26,6 @@ export default function TanitimPage() {
         <div className="hidden md:flex items-center gap-6 text-sm text-slate-500 font-medium">
           <a href="#ozellikler" className="hover:text-slate-900 transition-colors">Özellikler</a>
           <a href="#fiyatlandirma" className="hover:text-slate-900 transition-colors">Fiyatlandırma</a>
-          <a href="#yorumlar" className="hover:text-slate-900 transition-colors">Yorumlar</a>
           <a href="#sss" className="hover:text-slate-900 transition-colors">SSS</a>
         </div>
         <div className="flex items-center gap-3">
@@ -40,15 +45,29 @@ export default function TanitimPage() {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-[1.1] max-w-4xl mb-6 tracking-tight">
-          Trendyol'da Kazan,<br />
+          E-Ticarette Kazan,<br />
           <span className="text-green-600">Yapay Zeka</span> ile<br />
           Büyü
         </h1>
 
-        <p className="text-xl text-slate-500 max-w-2xl mb-10 leading-relaxed">
+        <p className="text-xl text-slate-500 max-w-2xl mb-8 leading-relaxed">
           Ürün analizi, sipariş takibi, stok yönetimi ve pazaryeri entegrasyonu —
           hepsi tek panelde. Ücretsiz başla, anında kullan.
         </p>
+
+        {/* Yeni özellikler özet pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+          {[
+            { icon: "🚀", label: "0'dan Mağaza Kur" },
+            { icon: "🎨", label: "9 Farklı AI Logo" },
+            { icon: "🔍", label: "Ürün Arama" },
+            { icon: "🗑️", label: "Tam Kontrol" },
+          ].map(item => (
+            <span key={item.label} className="inline-flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
+              {item.icon} {item.label}
+            </span>
+          ))}
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Link href="/kayit" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-lg text-base transition-all hover:shadow-xl hover:-translate-y-0.5">
@@ -59,13 +78,6 @@ export default function TanitimPage() {
           </Link>
         </div>
 
-        {/* Sosyal Kanıt Sayaçlar */}
-        <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-          <StatBadge value="2,400+" label="Aktif Satıcı" />
-          <StatBadge value="180,000+" label="Analiz Yapıldı" />
-          <StatBadge value="4.8/5" label="Kullanıcı Puanı" />
-          <StatBadge value="₺0" label="Başlangıç Ücreti" />
-        </div>
       </section>
 
       {/* LOGO BAR */}
@@ -77,8 +89,6 @@ export default function TanitimPage() {
           <div className="flex items-center gap-2 text-orange-600 font-bold text-lg">🟠 Trendyol</div>
           <div className="text-slate-200 text-2xl">|</div>
           <div className="flex items-center gap-2 text-amber-600 font-bold text-lg">🟡 Hepsiburada</div>
-          <div className="text-slate-200 text-2xl">|</div>
-          <div className="flex items-center gap-2 text-emerald-700 font-bold text-lg">🤖 OpenAI GPT-4o</div>
         </div>
       </section>
 
@@ -106,11 +116,11 @@ export default function TanitimPage() {
                 {[
                   ["Ücretsiz başlangıç planı", true, false],
                   ["AI ürün analizi & skor", true, false],
+                  ["0'dan Mağaza Kur (AI)", true, false],
+                  ["9 farklı AI logo oluşturma", true, false],
                   ["Trendyol & HB entegrasyonu", true, "Kısıtlı"],
                   ["Başlık & açıklama üretici (AI)", true, false],
-                  ["Rakip yorum analizi (AI)", true, false],
-                  ["Fiyat stratejisi asistanı (AI)", true, false],
-                  ["Trend keşfi", true, false],
+                  ["Sipariş / Müşteri / Analiz silme", true, false],
                   ["Aylık maliyet", "0₺ - 879₺", "500₺+"],
                   ["Kurulum gerektirmez", true, false],
                 ].map(([feat, scalevo, other], i) => (
@@ -143,35 +153,35 @@ export default function TanitimPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FeatureCard icon={<Rocket size={26} />} iconBg="bg-green-100 text-green-600"
+              title="0'dan Mağaza Kur" badge="Yeni"
+              desc="Hiç mağazan yokken bile başlayabilirsin. Niş seç, ürün ara, AI ile logo ve slogan oluştur."
+              items={["Gerçek pazar & komisyon verileri", "AI ürün arama & önerileri", "9 farklı logo stili oluştur", "AI slogan & ilk reklam"]} />
+
             <FeatureCard icon={<BrainCircuit size={26} />} iconBg="bg-violet-100 text-violet-600"
               title="AI Ürün Analizi" badge="Popüler"
               desc="Ürün adını gir, satılabilirlik skoru, rekabet durumu ve fiyat aralığını saniyeler içinde öğren."
-              items={["0-100 satılabilirlik skoru", "Rekabet & fiyat analizi", "AI tavsiyesi"]} />
+              items={["0-100 satılabilirlik skoru", "Rekabet & fiyat analizi", "AI tavsiyesi", "Analiz geçmişi & silme"]} />
 
-            <FeatureCard icon={<Sparkles size={26} />} iconBg="bg-green-100 text-green-600"
-              title="AI Araçlar" badge="Yeni"
+            <FeatureCard icon={<Sparkles size={26} />} iconBg="bg-amber-100 text-amber-600"
+              title="AI Araçlar"
               desc="Başlık üretici, fiyatlama asistanı, trend keşfi ve yorum analizi — hepsi yapay zeka ile."
               items={["SEO başlık & açıklama üretici", "Optimal fiyat stratejisi", "Rakip yorum analizi"]} />
 
-            <FeatureCard icon={<Store size={26} />} iconBg="bg-orange-100 text-orange-600"
-              title="Pazaryeri Entegrasyonu" badge="Yeni"
-              desc="Trendyol ve Hepsiburada API'larını bağla, siparişleri ve ürünleri tek panelden yönet."
-              items={["Trendyol & Hepsiburada", "Otomatik sipariş senkronizasyonu", "Ürün listeleme takibi"]} />
-
             <FeatureCard icon={<ShoppingBag size={26} />} iconBg="bg-blue-100 text-blue-600"
               title="Sipariş Yönetimi"
-              desc="Gelen siparişleri onayla, hazırla, kargola. Tüm süreç elinizin altında."
-              items={["Yeni → Hazır → Kargo → Teslim", "Anlık durum güncelleme", "Müşteri takibi"]} />
+              desc="Gelen siparişleri onayla, hazırla, kargola. Tam kontrol elinizde."
+              items={["Yeni → Hazır → Kargo → Teslim", "Anlık durum güncelleme", "Sipariş silme"]} />
+
+            <FeatureCard icon={<Users size={26} />} iconBg="bg-pink-100 text-pink-600"
+              title="Müşteri Yönetimi"
+              desc="Siparişlerden oluşan müşteri profilleri, notlar ve harcama geçmişi."
+              items={["Müşteri profili & sipariş geçmişi", "Not ekleme & silme", "Müşteri silme"]} />
 
             <FeatureCard icon={<Boxes size={26} />} iconBg="bg-teal-100 text-teal-600"
-              title="Stok Yönetimi"
-              desc="Ürünlerini ekle, stoklarını takip et, kritik seviyede uyarı al."
-              items={["Ürün & SKU yönetimi", "Kritik stok uyarıları", "Stok hareket geçmişi"]} />
-
-            <FeatureCard icon={<TrendingUp size={26} />} iconBg="bg-emerald-100 text-emerald-600"
-              title="Finansal Takip"
-              desc="Ciro, net kar ve reklam giderlerini görün. Haftalık grafik ile büyümeyi izle."
-              items={["Ciro & kar hesaplama", "Haftalık sipariş grafiği", "Reklam gider takibi"]} />
+              title="Stok & Finans"
+              desc="Ürünlerini ekle, stoklarını takip et. Ciro ve karını izle."
+              items={["Ürün & SKU yönetimi", "Kritik stok uyarıları", "Ciro & kar hesaplama"]} />
           </div>
         </div>
       </section>
@@ -186,30 +196,6 @@ export default function TanitimPage() {
             <Step number="1" icon="✉️" title="Kayıt Ol" desc="E-posta ile ücretsiz hesap oluştur. Kredi kartı gerekmez." />
             <Step number="2" icon="🤖" title="AI Analiz Yap" desc="Satmayı düşündüğün ürünün adını gir, skoru ve tavsiyeyi anında al." />
             <Step number="3" icon="🚀" title="Büyü" desc="Siparişleri yönet, stoğu takip et, kazancını izle." />
-          </div>
-        </div>
-      </section>
-
-      {/* YORUMLAR */}
-      <section id="yorumlar" className="py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-green-600 font-semibold text-sm uppercase tracking-wide mb-3">Kullanıcı Yorumları</p>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Satıcılar ne diyor?</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Testimonial
-              name="Emre K." role="Trendyol Satıcısı" stars={5}
-              text="AI ürün analizi gerçekten işe yarıyor. İlk haftada 3 yeni ürün denedim, 2'si tuttu. Eskiden bu araştırmayı saatler sürerdi."
-            />
-            <Testimonial
-              name="Selin A." role="Hepsiburada & Trendyol" stars={5}
-              text="Iki pazaryerini tek panelden yönetmek hayat kurtarıcı. Sipariş takibi çok kolaylaştı, artık hiç sipariş kaçırmıyorum."
-            />
-            <Testimonial
-              name="Murat T." role="E-ticaret Girişimcisi" stars={5}
-              text="Stok yönetimi özelliği benim için en değerlisi. Kritik stok uyarısı gelince hemen sipariş veriyorum, ürün tükenmesi sorunu kalmadı."
-            />
           </div>
         </div>
       </section>
@@ -289,15 +275,6 @@ export default function TanitimPage() {
   );
 }
 
-function StatBadge({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="text-center">
-      <p className="text-2xl md:text-3xl font-extrabold text-slate-900">{value}</p>
-      <p className="text-sm text-slate-500 font-medium mt-0.5">{label}</p>
-    </div>
-  );
-}
-
 function FeatureCard({ icon, iconBg, title, badge, desc, items }: any) {
   return (
     <div className="p-7 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative">
@@ -327,21 +304,6 @@ function Step({ number, icon, title, desc }: any) {
       </div>
       <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
       <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
-    </div>
-  );
-}
-
-function Testimonial({ name, role, stars, text }: any) {
-  return (
-    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-      <div className="flex gap-0.5 mb-4">
-        {Array(stars).fill(0).map((_, i) => <Star key={i} size={14} className="text-amber-400" fill="currentColor" />)}
-      </div>
-      <p className="text-slate-700 text-sm leading-relaxed mb-5">"{text}"</p>
-      <div>
-        <p className="font-semibold text-slate-900 text-sm">{name}</p>
-        <p className="text-slate-400 text-xs">{role}</p>
-      </div>
     </div>
   );
 }
@@ -382,3 +344,7 @@ function FAQ({ q, a }: { q: string; a: string }) {
     </div>
   );
 }
+
+
+
+
