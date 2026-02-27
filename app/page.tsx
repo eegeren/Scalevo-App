@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BrainCircuit, AlertCircle, DollarSign, Package, TrendingUp, ShoppingBag, BarChart2, Clock,
-  ArrowUpRight, CheckCircle2, Truck, Share2, Copy, Check, Rocket, Store, RefreshCw
+  ArrowUpRight, CheckCircle2, Truck, Share2, Copy, Check, Rocket, Store, RefreshCw,
+  Calculator, ChevronDown
 } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,6 +30,11 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   completed: { label: "Tamamlandı", color: "bg-slate-100 text-slate-600" },
 };
 
+const KOMISYON_ORANLARI: Record<string, number> = {
+  elektronik: 10, giyim: 20, "ev-yasam": 15, "evcil-hayvan": 15,
+  "bebek-cocuk": 13, spor: 15, kozmetik: 18, gida: 13,
+};
+
 const KATEGORILER = [
   { id: "elektronik",    label: "📱 Elektronik",       ornekler: ["Bluetooth Kulaklık", "Powerbank", "USB Hub", "Şarj Standı"] },
   { id: "giyim",         label: "👗 Giyim",             ornekler: ["Oversize Tişört", "Keten Pantolon", "Kaban", "Bere"] },
@@ -48,6 +54,13 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+
+  // Kâr Hesaplayıcı
+  const [showKar, setShowKar] = useState(false);
+  const [alisF, setAlisF] = useState("");
+  const [satisFiyat, setSatisFiyat] = useState("");
+  const [kargoMaliyet, setKargoMaliyet] = useState("25");
+  const [karPlatform, setKarPlatform] = useState("trendyol");
 
   const shareResult = () => {
     if (!result) return;
@@ -110,6 +123,9 @@ export default function Home() {
     setLoading(true);
     setResult(null);
     setError(null);
+    setShowKar(false);
+    setAlisF("");
+    setSatisFiyat("");
     try {
       const res = await fetch("/api/analiz", {
         method: "POST",
@@ -353,6 +369,126 @@ export default function Home() {
                   {copied ? <><Check size={13} /> Kopyalandı!</> : <><Share2 size={13} /> Paylaş</>}
                 </button>
               </CardContent>
+            </Card>
+            {/* KÂR HESAPLAYICI */}
+            <Card className="md:col-span-3 border-slate-200 shadow-sm overflow-hidden">
+              <button
+                onClick={() => {
+                  setShowKar(v => !v);
+                  if (!satisFiyat && result?.priceRange) {
+                    const parts = result.priceRange.replace(/₺/g, "").split("-").map((s: string) => s.trim());
+                    if (parts[1]) setSatisFiyat(parts[1]);
+                  }
+                }}
+                className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
+                    <Calculator size={16} />
+                  </div>
+                  <span className="font-semibold text-slate-800 text-sm">Kâr Hesaplayıcı</span>
+                  <span className="text-xs text-slate-400">— alış fiyatını gir, net kârı gör</span>
+                </div>
+                <ChevronDown size={16} className={`text-slate-400 transition-transform ${showKar ? "rotate-180" : ""}`} />
+              </button>
+
+              {showKar && (() => {
+                const komisyon = KOMISYON_ORANLARI[kategori] ?? 15;
+                const satis = parseFloat(satisFiyat) || 0;
+                const alis = parseFloat(alisF) || 0;
+                const kargo = parseFloat(kargoMaliyet) || 0;
+                const hizmetBedeli = karPlatform === "trendyol" ? satis * 0.02 : satis * 0.025;
+                const komisyonTutari = satis * (komisyon / 100);
+                const netGelir = satis - komisyonTutari - hizmetBedeli - kargo;
+                const kar = netGelir - alis;
+                const marj = satis > 0 ? (kar / satis * 100) : 0;
+                const karRenk = kar > 0 ? "text-green-600" : "text-red-500";
+                const marjRenk = marj > 20 ? "bg-green-100 text-green-700" : marj > 0 ? "bg-orange-100 text-orange-700" : "bg-red-100 text-red-600";
+                return (
+                  <div className="border-t border-slate-100 p-4 space-y-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">Alış Fiyatı (₺)</label>
+                        <input
+                          type="number" placeholder="örn: 120"
+                          value={alisF} onChange={e => setAlisF(e.target.value)}
+                          className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">Satış Fiyatı (₺)</label>
+                        <input
+                          type="number" placeholder="örn: 299"
+                          value={satisFiyat} onChange={e => setSatisFiyat(e.target.value)}
+                          className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">Kargo Maliyeti (₺)</label>
+                        <input
+                          type="number" placeholder="25"
+                          value={kargoMaliyet} onChange={e => setKargoMaliyet(e.target.value)}
+                          className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">Platform</label>
+                        <select
+                          value={karPlatform} onChange={e => setKarPlatform(e.target.value)}
+                          className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                        >
+                          <option value="trendyol">🟠 Trendyol</option>
+                          <option value="hepsiburada">🟡 Hepsiburada</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {satis > 0 && alis > 0 && (
+                      <div className="bg-slate-50 rounded-xl p-4 space-y-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                          <div className="bg-white rounded-lg p-3 border border-slate-100">
+                            <p className="text-xs text-slate-400 mb-1">Komisyon ({komisyon}%)</p>
+                            <p className="font-bold text-slate-700">-{komisyonTutari.toFixed(0)}₺</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 border border-slate-100">
+                            <p className="text-xs text-slate-400 mb-1">Hizmet Bedeli</p>
+                            <p className="font-bold text-slate-700">-{hizmetBedeli.toFixed(0)}₺</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 border border-slate-100">
+                            <p className="text-xs text-slate-400 mb-1">Kargo</p>
+                            <p className="font-bold text-slate-700">-{kargo.toFixed(0)}₺</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-3 border border-slate-100">
+                            <p className="text-xs text-slate-400 mb-1">Alış Maliyeti</p>
+                            <p className="font-bold text-slate-700">-{alis.toFixed(0)}₺</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-white rounded-xl border-2 border-slate-200">
+                          <div>
+                            <p className="text-xs text-slate-400">Net Kâr</p>
+                            <p className={`text-2xl font-black ${karRenk}`}>{kar.toFixed(0)}₺</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-400 mb-1">Kâr Marjı</p>
+                            <span className={`text-lg font-black px-3 py-1 rounded-lg ${marjRenk}`}>
+                              %{Math.abs(marj).toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                        {kar < 0 && (
+                          <p className="text-xs text-red-500 text-center">⚠️ Bu fiyatla zarar ediyorsun — satış fiyatını artır veya alış maliyetini düşür.</p>
+                        )}
+                        {kar > 0 && marj < 10 && (
+                          <p className="text-xs text-orange-500 text-center">⚠️ Marj düşük (%10 altı). Ölçeklenmesi zorlaşabilir.</p>
+                        )}
+                        {kar > 0 && marj >= 10 && (
+                          <p className="text-xs text-green-600 text-center">✅ Sağlıklı bir kâr marjı!</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </Card>
           </div>
         </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2
+  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2, Crosshair
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -62,6 +62,7 @@ export default function Sidebar({ user }: SidebarProps) {
         <NavItem href="/stok" icon={<Boxes size={18} />} label="Stok Yönetimi" active={pathname === "/stok"} />
         <NavItem href="/musteriler" icon={<Users size={18} />} label="Müşteriler" active={pathname === "/musteriler"} />
         <NavItem href="/hedefler" icon={<Target size={18} />} label="Hedefler & KPI" active={pathname === "/hedefler"} />
+        <NavItem href="/rakip-takip" icon={<Crosshair size={18} />} label="Rakip Takibi" active={pathname === "/rakip-takip"} />
         <NavItem href="/finans" icon={<TrendingUp size={18} />} label="Finansal Durum" active={pathname === "/finans"} />
         <NavItem href="/pazaryerleri" icon={<Store size={18} />} label="Pazaryerleri" active={pathname === "/pazaryerleri"} badge="Yeni" />
         {storeName && (
