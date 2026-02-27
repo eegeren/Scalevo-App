@@ -68,7 +68,7 @@ export default function FinansPage() {
         <p className="text-slate-500 mt-2">Nakit akışın ve karlılık raporların.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
         <Card className="bg-slate-900 text-white border-none shadow-md">
           <CardContent className="p-6">
             <p className="text-slate-400 text-sm mb-1">Toplam Ciro (Tüm Siparişler)</p>

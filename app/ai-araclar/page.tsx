@@ -35,7 +35,7 @@ export default function AIAraclarPage() {
       </div>
 
       {/* Tab Seçici */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
         {TABS.map(tab => (
           <button
             key={tab.id}

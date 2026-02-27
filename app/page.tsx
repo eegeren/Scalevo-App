@@ -162,21 +162,21 @@ export default function Home() {
       {/* ANALİZ BÖLÜMÜ */}
       <Card className="border-slate-200 shadow-sm overflow-hidden">
         <div className="h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-400"></div>
-        <CardContent className="p-8">
-          <div className="max-w-2xl mx-auto text-center space-y-6">
-            <h4 className="text-2xl font-semibold text-slate-700">Ürün Fikri Doğrulama</h4>
-            <p className="text-slate-500">Ürün adını gir, potansiyelini yapay zeka ile ölçelim.</p>
-            <div className="flex gap-2 relative max-w-lg mx-auto">
+        <CardContent className="p-5 md:p-8">
+          <div className="max-w-2xl mx-auto text-center space-y-4 md:space-y-6">
+            <h4 className="text-xl md:text-2xl font-semibold text-slate-700">Ürün Fikri Doğrulama</h4>
+            <p className="text-slate-500 text-sm md:text-base">Ürün adını gir, potansiyelini yapay zeka ile ölçelim.</p>
+            <div className="flex flex-col sm:flex-row gap-2 max-w-lg mx-auto">
               <Input
                 placeholder="Örn: Kedi Su Pınarı"
-                className="h-12 text-lg px-4 border-slate-200 focus-visible:ring-green-500 shadow-sm"
+                className="h-11 md:h-12 text-base px-4 border-slate-200 focus-visible:ring-green-500 shadow-sm flex-1"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleAnalyze()}
               />
               <Button
                 size="lg"
-                className="h-12 px-8 bg-green-600 hover:bg-green-700 font-medium min-w-[140px]"
+                className="h-11 md:h-12 px-6 bg-green-600 hover:bg-green-700 font-medium w-full sm:w-auto"
                 onClick={handleAnalyze}
                 disabled={loading}
               >
