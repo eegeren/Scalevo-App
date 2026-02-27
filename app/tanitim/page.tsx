@@ -121,7 +121,7 @@ export default function TanitimPage() {
                   ["Trendyol & HB entegrasyonu", true, "Kısıtlı"],
                   ["Başlık & açıklama üretici (AI)", true, false],
                   ["Sipariş / Müşteri / Analiz silme", true, false],
-                  ["Aylık maliyet", "0₺ - 879₺", "500₺+"],
+                  ["Aylık maliyet", "0₺ - 499", "1000₺+"],
                   ["Kurulum gerektirmez", true, false],
                 ].map(([feat, scalevo, other], i) => (
                   <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
@@ -213,7 +213,7 @@ export default function TanitimPage() {
               desc="E-ticarete yeni başlayanlar için temel araçlar."
               ctaLabel="Ücretsiz Başla" ctaHref="/kayit"
               items={["Aylık 20 AI analizi", "Sipariş yönetimi", "Stok takibi (50 ürün)", "Finans özeti"]} />
-            <PricingCard title="Scale" price="879 ₺" period="/ ay" badge="En Popüler"
+            <PricingCard title="Scale" price="499 ₺" period="/ ay" badge="En Popüler"
               desc="Büyüyen mağazalar için tam kapsamlı paket."
               ctaLabel="Scale'e Geç" ctaHref="/kayit" highlighted
               items={["Sınırsız AI analizi", "Trendyol & Hepsiburada entegrasyon", "Sınırsız stok yönetimi", "AI Araçlar (başlık, fiyat, trend)", "Müşteri yönetimi (CRM)", "Öncelikli destek"]} />
