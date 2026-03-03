@@ -4,18 +4,17 @@ import { useState, useEffect } from "react";
 import {
   User, KeyRound, Store, Bell, ShieldAlert, Eye, EyeOff,
   CheckCircle2, RefreshCw, AlertCircle, Save, LogOut, Trash2,
-  ChevronRight, BrainCircuit
+  ChevronRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-type Tab = "profil" | "api" | "pazaryeri" | "bildirimler" | "hesap";
+type Tab = "profil" | "pazaryeri" | "bildirimler" | "hesap";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "profil", label: "Profil", icon: <User size={16} /> },
-  { id: "api", label: "API Anahtarları", icon: <BrainCircuit size={16} /> },
   { id: "pazaryeri", label: "Pazaryeri", icon: <Store size={16} /> },
   { id: "bildirimler", label: "Bildirimler", icon: <Bell size={16} /> },
   { id: "hesap", label: "Hesap Güvenliği", icon: <ShieldAlert size={16} /> },
@@ -35,7 +34,7 @@ export default function AyarlarPage() {
       {/* Başlık */}
       <div>
         <h2 className="text-3xl font-bold text-slate-900">Ayarlar</h2>
-        <p className="text-slate-500 mt-1">Hesap, API ve entegrasyon ayarlarını yönet.</p>
+        <p className="text-slate-500 mt-1">Hesap ve entegrasyon ayarlarını yönet.</p>
       </div>
 
       {/* Toast Bildirimi */}
@@ -75,7 +74,6 @@ export default function AyarlarPage() {
         {/* İçerik */}
         <div className="flex-1">
           {activeTab === "profil" && <ProfilTab onToast={showToast} />}
-          {activeTab === "api" && <APITab onToast={showToast} />}
           {activeTab === "pazaryeri" && <PazaryeriTab onToast={showToast} />}
           {activeTab === "bildirimler" && <BildirimlerTab onToast={showToast} />}
           {activeTab === "hesap" && <HesapTab onToast={showToast} />}
@@ -167,111 +165,6 @@ function ProfilTab({ onToast }: { onToast: (msg: string, type?: "success" | "err
         </Button>
       </CardContent>
     </Card>
-  );
-}
-
-/* ─── API ANAHTARLARI ─── */
-function APITab({ onToast }: { onToast: (msg: string, type?: "success" | "error") => void }) {
-  const [openaiKey, setOpenaiKey] = useState("");
-  const [showKey, setShowKey] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("scalevo_openai_key");
-    if (saved) setOpenaiKey(saved);
-  }, []);
-
-  const saveKey = async () => {
-    setLoading(true);
-    try {
-      // Test the key
-      const res = await fetch("/api/test-openai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey: openaiKey }),
-      });
-
-      if (res.ok) {
-        localStorage.setItem("scalevo_openai_key", openaiKey);
-        onToast("OpenAI API anahtarı kaydedildi ✓");
-      } else {
-        // Save anyway even if test fails (env key might be used)
-        localStorage.setItem("scalevo_openai_key", openaiKey);
-        onToast("Anahtar kaydedildi (doğrulama yapılamadı)");
-      }
-    } catch {
-      localStorage.setItem("scalevo_openai_key", openaiKey);
-      onToast("Anahtar kaydedildi ✓");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const removeKey = () => {
-    localStorage.removeItem("scalevo_openai_key");
-    setOpenaiKey("");
-    onToast("API anahtarı silindi.");
-  };
-
-  return (
-    <div className="space-y-4">
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader className="border-b border-slate-100">
-          <CardTitle className="text-base flex items-center gap-2">
-            <BrainCircuit size={18} className="text-green-600" /> OpenAI API Anahtarı
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-700">
-            <AlertCircle size={14} className="flex-shrink-0" />
-            <span>
-              Ürün analiz özelliği için OpenAI API anahtarı gereklidir.{" "}
-              <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="underline font-medium">
-                platform.openai.com
-              </a>
-              {" "}adresinden alabilirsiniz.
-            </span>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-slate-600 mb-1.5 block">API Anahtarı</label>
-            <div className="relative">
-              <Input
-                type={showKey ? "text" : "password"}
-                value={openaiKey}
-                onChange={e => setOpenaiKey(e.target.value)}
-                placeholder="sk-proj-..."
-                className="bg-slate-50 border-slate-200 focus-visible:ring-green-500 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowKey(!showKey)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-              >
-                {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {openaiKey && (
-            <div className="flex items-center gap-2 text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
-              <CheckCircle2 size={13} /> API anahtarı kayıtlı
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <Button onClick={saveKey} disabled={loading || !openaiKey} className="bg-green-600 hover:bg-green-700 gap-2">
-              {loading ? <><RefreshCw size={14} className="animate-spin" /> Kaydediliyor...</> : <><Save size={14} /> Kaydet</>}
-            </Button>
-            {openaiKey && (
-              <Button onClick={removeKey} variant="outline" className="border-red-200 text-red-600 hover:bg-red-50 gap-2">
-                <Trash2 size={14} /> Sil
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
   );
 }
 

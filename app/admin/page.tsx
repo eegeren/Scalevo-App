@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import {
   ShieldCheck, BarChart2, ShoppingBag, Package, AlertCircle,
-  RefreshCw, Users, TrendingUp, Zap, CheckCircle2, XCircle,
-  Clock, Activity, Database
+  RefreshCw, Users, TrendingUp, CheckCircle2, XCircle,
+  Activity, Database
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -151,20 +151,20 @@ export default function AdminPage() {
           {activeTab === "overview" && (
             <div className="space-y-6">
               {/* İstatistik kartları */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <StatCard
                   icon={<BarChart2 size={20} className="text-green-600" />}
                   label="Toplam Analiz"
                   value={data?.stats?.totalAnalyses ?? "—"}
                   color="bg-green-50"
-                  desc="Tüm kullanıcıların analizleri"
+                  desc={`Son 24s: ${data?.stats?.analyses24h ?? 0}`}
                 />
                 <StatCard
                   icon={<ShoppingBag size={20} className="text-blue-600" />}
                   label="Toplam Sipariş"
                   value={data?.stats?.totalOrders ?? "—"}
                   color="bg-blue-50"
-                  desc="Tüm kullanıcıların siparişleri"
+                  desc={`Son 24s: ${data?.stats?.orders24h ?? 0}`}
                 />
                 <StatCard
                   icon={<Package size={20} className="text-purple-600" />}
@@ -172,6 +172,27 @@ export default function AdminPage() {
                   value={data?.stats?.totalProducts ?? "—"}
                   color="bg-purple-50"
                   desc="Stok kayıtları"
+                />
+                <StatCard
+                  icon={<Users size={20} className="text-cyan-700" />}
+                  label="Toplam Kullanıcı"
+                  value={data?.stats?.totalUsers ?? "—"}
+                  color="bg-cyan-50"
+                  desc="Abonelik kaydı olan hesaplar"
+                />
+                <StatCard
+                  icon={<TrendingUp size={20} className="text-emerald-700" />}
+                  label="Toplam Ciro"
+                  value={`${Number(data?.stats?.totalRevenue || 0).toLocaleString("tr-TR")}₺`}
+                  color="bg-emerald-50"
+                  desc="orders.price_num toplamı"
+                />
+                <StatCard
+                  icon={<AlertCircle size={20} className="text-red-600" />}
+                  label="24s Hata"
+                  value={data?.stats?.errors24h ?? 0}
+                  color="bg-red-50"
+                  desc="app_errors (son 24 saat)"
                 />
               </div>
 
@@ -184,34 +205,69 @@ export default function AdminPage() {
                 </CardHeader>
                 <CardContent className="pt-4 space-y-3">
                   {[
-                    { name: "Supabase DB", status: data ? "ok" : "loading" },
-                    { name: "OpenAI API", status: "ok" },
-                    { name: "Auth Servisi", status: data ? "ok" : "loading" },
-                    { name: "Hata Sayısı", status: (data?.recentErrors?.length || 0) > 5 ? "warn" : "ok", value: data?.recentErrors?.length || 0 },
-                  ].map(item => (
+                    ...(data?.infrastructure || []),
+                    {
+                      name: "DB Sağlık",
+                      status: data?.health?.dbPingOk ? "ok" : "error",
+                      detail: data?.health?.dbPingOk ? `${data?.health?.dbLatencyMs ?? "—"}ms` : "Bağlantı sorunu",
+                    },
+                    {
+                      name: "Kayıtlı Hata (panelde)",
+                      status: (data?.recentErrors?.length || 0) > 5 ? "warn" : "ok",
+                      detail: `${data?.recentErrors?.length || 0} adet`,
+                    },
+                  ].map((item: any) => (
                     <div key={item.name} className="flex items-center justify-between py-1.5 border-b border-slate-50 last:border-0">
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${
                           item.status === "ok" ? "bg-green-500" :
+                          item.status === "error" ? "bg-red-500" :
                           item.status === "warn" ? "bg-orange-400" :
                           "bg-slate-300 animate-pulse"
                         }`} />
                         <span className="text-sm text-slate-700">{item.name}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {item.value !== undefined && (
-                          <span className="text-xs font-bold text-slate-500">{item.value}</span>
+                      <div className="flex items-center gap-3">
+                        {item.detail && (
+                          <span className="text-xs text-slate-500">{item.detail}</span>
                         )}
                         <span className={`text-xs font-medium ${
                           item.status === "ok" ? "text-green-600" :
+                          item.status === "error" ? "text-red-600" :
                           item.status === "warn" ? "text-orange-500" :
                           "text-slate-400"
                         }`}>
-                          {item.status === "ok" ? "Çalışıyor" : item.status === "warn" ? "Dikkat" : "Kontrol ediliyor"}
+                          {item.status === "ok" ? "Çalışıyor" : item.status === "warn" ? "Dikkat" : item.status === "error" ? "Hata" : "Kontrol ediliyor"}
                         </span>
                       </div>
                     </div>
                   ))}
+                </CardContent>
+              </Card>
+
+              {/* DB sağlık detayı */}
+              <Card className="border-slate-200 shadow-sm">
+                <CardHeader className="pb-3 border-b border-slate-100">
+                  <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <Database size={15} className="text-slate-700" /> Veritabanı Sağlığı
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-2">
+                  <p className="text-sm text-slate-700">
+                    Ping: <span className="font-semibold">{data?.health?.dbLatencyMs ?? "—"}ms</span>
+                  </p>
+                  {data?.health?.missingTables?.length > 0 ? (
+                    <div className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg p-3 space-y-1">
+                      <p className="font-semibold">Eksik/erişilemeyen tablo tespit edildi:</p>
+                      {data.health.missingTables.map((msg: string, i: number) => (
+                        <p key={i} className="truncate">• {msg}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-green-700 bg-green-50 border border-green-100 rounded-lg p-3">
+                      Kritik admin tabloları erişilebilir görünüyor.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -285,36 +341,55 @@ export default function AdminPage() {
 
           {/* ── Siparişler ── */}
           {activeTab === "orders" && (
-            <Card className="border-slate-200 shadow-sm">
-              <CardHeader className="pb-3 border-b border-slate-100">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <ShoppingBag size={14} className="text-blue-600" /> Son 10 Sipariş (Tüm Kullanıcılar)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {!data?.recentOrders?.length ? (
-                  <p className="text-center py-12 text-slate-400 text-sm">Henüz sipariş yok.</p>
-                ) : (
-                  <div className="divide-y divide-slate-50">
-                    {data.recentOrders.map((o: any, i: number) => {
-                      const st = STATUS_LABELS[o.status] || STATUS_LABELS.new;
-                      return (
-                        <div key={i} className="flex items-center justify-between px-5 py-3">
-                          <div>
-                            <p className="text-sm font-semibold text-slate-800">{o.customer}</p>
-                            <p className="text-xs text-slate-500 truncate max-w-[200px]">{o.item} · {o.date}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {[
+                  { key: "new", label: "Yeni" },
+                  { key: "preparing", label: "Hazırlanıyor" },
+                  { key: "shipped", label: "Kargoda" },
+                  { key: "completed", label: "Tamamlandı" },
+                  { key: "returned", label: "İade" },
+                ].map((s) => (
+                  <Card key={s.key} className="border-slate-200 shadow-sm">
+                    <CardContent className="p-4">
+                      <p className="text-xs text-slate-500">{s.label}</p>
+                      <p className="text-2xl font-bold text-slate-800">{data?.orderStatusCounts?.[s.key] ?? 0}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <Card className="border-slate-200 shadow-sm">
+                <CardHeader className="pb-3 border-b border-slate-100">
+                  <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <ShoppingBag size={14} className="text-blue-600" /> Son 10 Sipariş (App + Pazaryeri)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {!data?.recentOrders?.length ? (
+                    <p className="text-center py-12 text-slate-400 text-sm">Henüz sipariş yok.</p>
+                  ) : (
+                    <div className="divide-y divide-slate-50">
+                      {data.recentOrders.map((o: any, i: number) => {
+                        const st = STATUS_LABELS[o.status] || STATUS_LABELS.new;
+                        return (
+                          <div key={i} className="flex items-center justify-between px-5 py-3">
+                            <div>
+                              <p className="text-sm font-semibold text-slate-800">{o.customer}</p>
+                              <p className="text-xs text-slate-500 truncate max-w-[280px]">{o.item} · {o.date || "—"}</p>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase">{o.source || "app"}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${st.color}`}>{st.label}</span>
+                              <span className="text-sm font-bold text-slate-700">{o.price}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-3 flex-shrink-0">
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${st.color}`}>{st.label}</span>
-                            <span className="text-sm font-bold text-slate-700">{o.price}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* ── Hatalar ── */}

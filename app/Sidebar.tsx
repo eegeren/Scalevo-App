@@ -60,7 +60,7 @@ export default function Sidebar({ user }: SidebarProps) {
   };
 
   return (
-    <aside className="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col p-6 shadow-sm sticky top-0 h-screen">
+    <aside className="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col p-6 shadow-sm sticky top-0 h-screen overflow-y-auto">
       <div className="flex items-center gap-3 mb-10 px-2">
         <div className="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
           <Zap size={22} />
@@ -75,7 +75,7 @@ export default function Sidebar({ user }: SidebarProps) {
         </div>
       </div>
 
-      <nav className="space-y-1.5 flex-1">
+      <nav className="space-y-1.5">
         <NavItem href="/" icon={<LayoutDashboard size={18} />} label="Genel Bakış" active={pathname === "/"} />
         <NavItem href="/analiz" icon={<Search size={18} />} label="Ürün Analiz & Skor" active={pathname.startsWith("/analiz")} />
         <NavItem href="/ai-araclar" icon={<Sparkles size={18} />} label="AI Araçlar" active={pathname === "/ai-araclar"} badge="Yeni" />
@@ -104,7 +104,7 @@ export default function Sidebar({ user }: SidebarProps) {
         )}
       </nav>
 
-      <div className="mt-auto space-y-3">
+      <div className="mt-4 space-y-3">
         {/* Plan bilgisi */}
         {planInfo && (
           planInfo.plan === "free" ? (
