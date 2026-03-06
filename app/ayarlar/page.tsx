@@ -463,7 +463,7 @@ function HesapTab({ onToast }: { onToast: (msg: string, type?: "success" | "erro
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = "/";
+    window.location.href = "/tanitim";
   };
 
   return (

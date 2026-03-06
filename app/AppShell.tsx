@@ -59,8 +59,7 @@ export default function AppShell({ children, user }: AppShellProps) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
+    window.location.href = "/tanitim";
   };
 
   return (
