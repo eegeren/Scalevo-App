@@ -13,7 +13,7 @@ export default function BrandIcon({
   variant = "solid",
   className = "",
 }: BrandIconProps) {
-  const height = size === "sm" ? 28 : 36;
+  const height = size === "sm" ? 40 : 52;
   const width = Math.round(height * 2.27);
 
   return (
