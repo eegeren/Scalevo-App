@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Zap, BarChart2, ShoppingBag, TrendingUp } from "lucide-react";
+import { BarChart2, ShoppingBag, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 export default function KayitPage() {
   const [name, setName] = useState("");
@@ -55,9 +56,7 @@ export default function KayitPage() {
       {/* Sol panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 flex-col justify-between p-12 text-white">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-            <Zap size={22} className="text-white" />
-          </div>
+          <BrandIcon variant="glass" />
           <span className="text-xl font-bold tracking-tight">Scalevo</span>
         </div>
 
@@ -79,9 +78,7 @@ export default function KayitPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center">
-              <Zap size={20} className="text-white" />
-            </div>
+            <BrandIcon />
             <span className="text-xl font-bold text-slate-900">Scalevo</span>
           </div>
 

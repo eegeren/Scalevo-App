@@ -4,12 +4,13 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  LayoutDashboard, ShoppingBag, Sparkles, Zap, Menu, X,
+  LayoutDashboard, ShoppingBag, Sparkles, Menu, X,
   Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut, ShieldCheck
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -82,9 +83,7 @@ export default function AppShell({ children, user }: AppShellProps) {
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <Zap size={17} className="text-white" />
-                </div>
+                <BrandIcon size="sm" />
                 <span className="font-bold text-slate-900">Scalevo</span>
               </div>
               <button
@@ -159,9 +158,7 @@ export default function AppShell({ children, user }: AppShellProps) {
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center">
-              <Zap size={14} className="text-white" />
-            </div>
+            <BrandIcon size="sm" />
             <span className="font-bold text-slate-900 text-sm">Scalevo</span>
           </div>
           <div className="w-9" /> {/* Spacer */}

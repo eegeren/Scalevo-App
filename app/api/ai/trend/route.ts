@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -24,7 +25,7 @@ Sadece JSON döndür:
       "trendsSkoru": <1-100 arası trend gücü>,
       "buyumePotansiyeli": <"Düşük" | "Orta" | "Yüksek" | "Patlama Noktasında">,
       "tahminiRekabet": <"Düşük" | "Orta" | "Yüksek">,
-      "neden": "<Bu ürünün neden trend olduğu — 1 cümle>",
+      "neden": "<Bu ürünün neden trend olduğu - 1 cümle>",
       "tahminiIlgiSuresi": "<Bu trendin tahmini süresi>"
     }
   ],
@@ -44,7 +45,9 @@ Not: Tam olarak 8 ürün listele.`;
     const data = JSON.parse(response.choices[0].message.content!);
     return NextResponse.json(data);
   } catch (err: any) {
-    if (err?.status === 429) return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    return NextResponse.json({ error: "Trend analizi yapılamadı." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Trend analizi yapılamadı.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

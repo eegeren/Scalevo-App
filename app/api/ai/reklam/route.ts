@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -18,7 +19,7 @@ Kategori/niş: ${nis}${sloganMetni}
 
 Bu mağaza için 3 farklı reklam metni yaz:
 1. Trendyol/Hepsiburada ürün açıklaması için kısa ve güçlü bir tanıtım cümlesi
-2. Instagram/Facebook için emoji destekli sosyal medya paylaşımı  
+2. Instagram/Facebook için emoji destekli sosyal medya paylaşımı
 3. Müşteri güveni oluşturan bir slogan alternatifi
 
 Her birini net şekilde numaralandır. Türkçe yaz. Samimi ve satış odaklı ol.`;
@@ -34,9 +35,9 @@ Her birini net şekilde numaralandır. Türkçe yaz. Samimi ve satış odaklı o
     const reklam = response.choices[0].message.content || "";
     return NextResponse.json({ reklam });
   } catch (err: any) {
-    if (err?.status === 429) {
-      return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    }
-    return NextResponse.json({ error: "Reklam üretilemedi." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Reklam üretilemedi.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

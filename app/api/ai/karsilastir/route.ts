@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
-  const { urunler } = await req.json(); // string[]
+  const { urunler } = await req.json();
   if (!urunler || urunler.length < 2) {
     return NextResponse.json({ error: "En az 2 ürün gerekli" }, { status: 400 });
   }
@@ -45,7 +46,9 @@ Sadece JSON döndür:
     const data = JSON.parse(response.choices[0].message.content!);
     return NextResponse.json(data);
   } catch (err: any) {
-    if (err?.status === 429) return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    return NextResponse.json({ error: "Karşılaştırma yapılamadı." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Karşılaştırma yapılamadı.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

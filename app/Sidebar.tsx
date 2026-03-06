@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Zap, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2, Crosshair, Crown
+  LayoutDashboard, ShoppingBag, Search, TrendingUp, ChevronRight, LogOut, User, Store, Settings, Sparkles, Boxes, Users, Scale, Target, ShieldCheck, Building2, Crosshair, Crown
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 const ADMIN_EMAILS = ["egeevren@gmail.com", "admin@scalevo.com", "yusufege.erenn@gmail.com"];
 
@@ -62,9 +63,7 @@ export default function Sidebar({ user }: SidebarProps) {
   return (
     <aside className="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col p-6 shadow-sm sticky top-0 h-screen overflow-y-auto">
       <div className="flex items-center gap-3 mb-10 px-2">
-        <div className="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-          <Zap size={22} />
-        </div>
+        <BrandIcon className="flex-shrink-0" />
         <div className="min-w-0">
           <h1 className="font-bold text-lg text-slate-900 tracking-tight">Scalevo</h1>
           {storeName ? (

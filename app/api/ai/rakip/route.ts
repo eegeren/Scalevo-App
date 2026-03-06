@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const platformMetni = platform === "hepsiburada" ? "Hepsiburada" : "Trendyol";
 
-  const prompt = `Sen bir Türk e-ticaret fiyat analisti. 
+  const prompt = `Sen bir Türk e-ticaret fiyat analisti.
 ${platformMetni} pazaryerinde "${urun}" ürününü araştır.
 
 Türkiye piyasasındaki güncel fiyat verilerini JSON formatında döndür:
@@ -32,7 +33,9 @@ Türkiye piyasasındaki güncel fiyat verilerini JSON formatında döndür:
     const data = JSON.parse(response.choices[0].message.content!);
     return NextResponse.json(data);
   } catch (err: any) {
-    if (err?.status === 429) return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    return NextResponse.json({ error: "Fiyat analizi yapılamadı." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Fiyat analizi yapılamadı.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

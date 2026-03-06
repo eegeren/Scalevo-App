@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -23,13 +24,12 @@ JSON formatında döndür (başka hiçbir şey yazma):
   {"ad": string, "emoji": string, "potansiyel": "Yüksek"|"Orta", "fiyat_araligi": string, "aciklama": string},
   {"ad": string, "emoji": string, "potansiyel": "Yüksek"|"Orta", "fiyat_araligi": string, "aciklama": string},
   {"ad": string, "emoji": string, "potansiyel": "Yüksek"|"Orta", "fiyat_araligi": string, "aciklama": string}
-]}`
+]}`,
         }],
       });
       return NextResponse.json(JSON.parse(response.choices[0].message.content!));
     }
 
-    // Ürün arama/değerlendirme
     if (action === "urun_ara") {
       const response = await client.chat.completions.create({
         model: "gpt-4o-mini",
@@ -40,7 +40,7 @@ JSON formatında döndür (başka hiçbir şey yazma):
           content: `Sen bir Türkiye e-ticaret uzmanısın. Kullanıcı "${query}" ürününü ${nis ? `"${nis}" nişinde` : "e-ticarette"} satmayı düşünüyor.
 Bu ürünün satış potansiyelini kısaca değerlendir ve ürün bilgilerini ver.
 JSON formatında döndür (başka hiçbir şey yazma):
-{"ad": string, "emoji": string, "potansiyel": "Yüksek"|"Orta"|"Düşük", "fiyat_araligi": string, "aciklama": string}`
+{"ad": string, "emoji": string, "potansiyel": "Yüksek"|"Orta"|"Düşük", "fiyat_araligi": string, "aciklama": string}`,
         }],
       });
       return NextResponse.json(JSON.parse(response.choices[0].message.content!));
@@ -56,7 +56,7 @@ JSON formatında döndür (başka hiçbir şey yazma):
           content: `"${magaza_adi}" adlı Türkiye e-ticaret mağazası "${nis}" nişinde satış yapıyor.
 Bu mağaza için çarpıcı bir slogan ve kısa açıklama yaz.
 JSON (başka hiçbir şey yazma):
-{"slogan": string, "aciklama": string}`
+{"slogan": string, "aciklama": string}`,
         }],
       });
       return NextResponse.json(JSON.parse(response.choices[0].message.content!));
@@ -72,7 +72,7 @@ JSON (başka hiçbir şey yazma):
           content: `"${magaza_adi}" mağazası için "${urun}" ürününe yönelik Instagram/Facebook reklamı yaz.
 Samimi, dikkat çekici ve Türk alışveriş kültürüne uygun olsun.
 JSON (başka hiçbir şey yazma):
-{"baslik": string, "metin": string, "cta": string, "hashtags": [string, string, string, string, string]}`
+{"baslik": string, "metin": string, "cta": string, "hashtags": [string, string, string, string, string]}`,
         }],
       });
       return NextResponse.json(JSON.parse(response.choices[0].message.content!));
@@ -80,12 +80,9 @@ JSON (başka hiçbir şey yazma):
 
     return NextResponse.json({ error: "Geçersiz işlem" }, { status: 400 });
   } catch (err: any) {
-    if (err?.status === 429) {
-      return NextResponse.json(
-        { error: "OpenAI kota aşıldı. Lütfen platform.openai.com/billing adresinden kredi yükle." },
-        { status: 429 }
-      );
-    }
-    return NextResponse.json({ error: "İşlem başarısız. Lütfen tekrar dene." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "İşlem başarısız. Lütfen tekrar dene.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
 Ürün: "${urun}"
 Kategori: "${kategori || "Belirtilmedi"}"
 
-Trendyol ve Hepsiburada'daki bu ürün kategorisinde müşterilerin tipik olarak ne gibi şikayetler ve övgüler yazdığını analiz et. Bu bilgiyi kullanarak rakiplerden nasıl öne çıkılabileceğini belirle.
+Trendyol ve Hepsiburada'daki bu ürün kategorisinde müşterilerin tipik olarak ne gibi şikayetler ve övgüler yazdığını analiz et. Bu bilgiyi kullanarak rakiplerden nasıl öne çıkabileceğini belirle.
 
 Sadece JSON döndür:
 {
@@ -25,7 +26,7 @@ Sadece JSON döndür:
   "fırsatlar": [
     { "baslik": "<Rakip boşluğu>", "aciklama": "<Bu boşluğu nasıl doldurabilirsin>", "oncelik": <"Kritik" | "Önemli" | "İyi Olur"> }
   ],
-  "idealMusteri": "<Bu ürünü genellikle kim alıyor — 1 cümle profil>",
+  "idealMusteri": "<Bu ürünü genellikle kim alıyor - 1 cümle profil>",
   "kazanmaFormulu": "<Rakipleri geçmek için 2-3 maddelik somut aksiyon planı>"
 }
 
@@ -41,7 +42,9 @@ Not: Şikayetler için 4-5 madde, övgüler için 3-4 madde, fırsatlar için 3-
     const data = JSON.parse(response.choices[0].message.content!);
     return NextResponse.json(data);
   } catch (err: any) {
-    if (err?.status === 429) return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    return NextResponse.json({ error: "Yorum analizi yapılamadı." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Yorum analizi yapılamadı.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

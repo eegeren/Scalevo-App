@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getOpenAIErrorMessage } from "@/lib/openai-error";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -22,9 +23,9 @@ Türk e-ticaret pazarını, rakip fiyatları ve komisyon oranlarını göz önü
   "trendyolKomisyon": <Tahmini Trendyol komisyon oranı, %, sayı>,
   "hepsiburadaKomisyon": <Tahmini Hepsiburada komisyon oranı, %, sayı>,
   "karMarji": <Bu fiyatta gerçekleşen tahmini kar marjı, %, sayı>,
-  "strateji": "<Hangi fiyat stratejisini kullanmalı: penetrasyon/premium/rekabetçi — 1-2 cümle>",
+  "strateji": "<Hangi fiyat stratejisini kullanmalı: penetrasyon/premium/rekabetçi - 1-2 cümle>",
   "uyari": "<Varsa dikkat edilmesi gereken fiyat riski, yoksa null>",
-  "rakipAnaliz": "<Piyasadaki rakip fiyat aralığı ve konumlanma tavsiyesi — 2 cümle>"
+  "rakipAnaliz": "<Piyasadaki rakip fiyat aralığı ve konumlanma tavsiyesi - 2 cümle>"
 }`;
 
   try {
@@ -37,7 +38,9 @@ Türk e-ticaret pazarını, rakip fiyatları ve komisyon oranlarını göz önü
     const data = JSON.parse(response.choices[0].message.content!);
     return NextResponse.json(data);
   } catch (err: any) {
-    if (err?.status === 429) return NextResponse.json({ error: "OpenAI kota aşıldı." }, { status: 429 });
-    return NextResponse.json({ error: "Fiyat analizi yapılamadı." }, { status: 500 });
+    return NextResponse.json(
+      { error: getOpenAIErrorMessage(err, "Fiyat analizi yapılamadı.") },
+      { status: err?.status === 429 ? 429 : 500 }
+    );
   }
 }

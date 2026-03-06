@@ -22,8 +22,6 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
-  "categories": ["business", "productivity"],
   "shortcuts": [
     {
       "name": "Ürün Analiz Et",
@@ -39,5 +37,7 @@
       "url": "/operasyonlar",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "screenshots": [],
+  "categories": ["business", "productivity"]
 }

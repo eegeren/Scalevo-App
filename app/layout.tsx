@@ -11,6 +11,14 @@ export const metadata: Metadata = {
   description: "Trendyol ve Hepsiburada satıcıları için yapay zeka destekli ürün analizi, sipariş ve stok yönetimi.",
   manifest: "/manifest.json",
   themeColor: "#16a34a",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

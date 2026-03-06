@@ -4,6 +4,7 @@ import {
   CheckCircle, ArrowRight, Package, Star, Sparkles, Store,
   Users, ChevronDown, Shield, Clock, Boxes, Rocket, Palette
 } from "lucide-react";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 export default function TanitimPage() {
   return (
@@ -18,9 +19,7 @@ export default function TanitimPage() {
       {/* NAVBAR */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-sm">
-            <Zap size={20} className="text-white" />
-          </div>
+          <BrandIcon />
           <span className="text-xl font-bold text-slate-900 tracking-tight">Scalevo</span>
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm text-slate-500 font-medium">

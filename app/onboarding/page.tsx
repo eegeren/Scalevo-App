@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Store, Package, BrainCircuit, CheckCircle2, ArrowRight, ChevronRight, Sparkles } from "lucide-react";
+import { Store, Package, BrainCircuit, CheckCircle2, ArrowRight, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 const STORE_TYPES = [
   { id: "trendyol", label: "Trendyol", icon: "🟠", desc: "Trendyol mağazam var" },
@@ -61,9 +62,7 @@ export default function OnboardingPage() {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-sm">
-            <Zap size={22} className="text-white" />
-          </div>
+          <BrandIcon />
           <span className="text-xl font-bold text-slate-900">Scalevo</span>
         </div>
 

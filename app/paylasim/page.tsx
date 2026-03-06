@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Zap, AlertCircle, DollarSign, Package, TrendingUp, BrainCircuit, ArrowRight } from "lucide-react";
+import { AlertCircle, DollarSign, Package, TrendingUp, BrainCircuit, ArrowRight } from "lucide-react";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 interface AnalysisData {
   urun: string;
@@ -52,9 +53,7 @@ export default function PaylasimPage() {
       {/* Header */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/80 backdrop-blur-sm">
         <Link href="/tanitim" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-            <Zap size={16} className="text-white" />
-          </div>
+          <BrandIcon size="sm" />
           <span className="font-bold text-slate-800">Scalevo</span>
         </Link>
         <Link href="/kayit" className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors">

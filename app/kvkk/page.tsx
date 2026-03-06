@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Zap, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import BrandIcon from "@/components/brand/BrandIcon";
 
 export default function KVKKPage() {
   return (
@@ -7,9 +8,7 @@ export default function KVKKPage() {
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
         <Link href="/tanitim" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-sm">
-            <Zap size={20} className="text-white" />
-          </div>
+          <BrandIcon />
           <span className="text-xl font-bold text-slate-900 tracking-tight">Scalevo</span>
         </Link>
         <Link href="/kayit" className="text-sm font-medium text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl shadow-sm transition-colors">
