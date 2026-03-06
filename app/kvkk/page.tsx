@@ -7,9 +7,8 @@ export default function KVKKPage() {
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
-        <Link href="/tanitim" className="flex items-center gap-2.5">
+        <Link href="/tanitim" className="flex items-center">
           <BrandIcon />
-          <span className="text-xl font-bold text-slate-900 tracking-tight">Scalevo</span>
         </Link>
         <Link href="/kayit" className="text-sm font-medium text-white bg-green-600 hover:bg-green-700 px-5 py-2.5 rounded-xl shadow-sm transition-colors">
           Ücretsiz Başla →

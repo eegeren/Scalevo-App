@@ -61,9 +61,8 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg">
 
         {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex items-center justify-center mb-8">
           <BrandIcon />
-          <span className="text-xl font-bold text-slate-900">Scalevo</span>
         </div>
 
         {/* Progress */}

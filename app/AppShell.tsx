@@ -81,9 +81,8 @@ export default function AppShell({ children, user }: AppShellProps) {
           <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center">
                 <BrandIcon size="sm" />
-                <span className="font-bold text-slate-900">Scalevo</span>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
@@ -156,9 +155,8 @@ export default function AppShell({ children, user }: AppShellProps) {
           >
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <BrandIcon size="sm" />
-            <span className="font-bold text-slate-900 text-sm">Scalevo</span>
           </div>
           <div className="w-9" /> {/* Spacer */}
         </header>
