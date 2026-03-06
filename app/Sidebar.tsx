@@ -56,7 +56,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/giris");
+    router.push("/");
     router.refresh();
   };
 

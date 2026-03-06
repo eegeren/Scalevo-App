@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import {
   User, KeyRound, Store, Bell, ShieldAlert, Eye, EyeOff,
   CheckCircle2, RefreshCw, AlertCircle, Save, LogOut, Trash2,
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 type Tab = "profil" | "pazaryeri" | "bildirimler" | "hesap";
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: "profil", label: "Profil", icon: <User size={16} /> },
   { id: "pazaryeri", label: "Pazaryeri", icon: <Store size={16} /> },
   { id: "bildirimler", label: "Bildirimler", icon: <Bell size={16} /> },
@@ -463,7 +463,7 @@ function HesapTab({ onToast }: { onToast: (msg: string, type?: "success" | "erro
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = "/giris";
+    window.location.href = "/";
   };
 
   return (
