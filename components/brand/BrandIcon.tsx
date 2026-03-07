@@ -14,7 +14,7 @@ export default function BrandIcon({
   className = "",
 }: BrandIconProps) {
   const height = size === "sm" ? 40 : 52;
-  const width = Math.round(height * 2.27);
+  const width = Math.round(height * 1.5);
 
   return (
     <Image
