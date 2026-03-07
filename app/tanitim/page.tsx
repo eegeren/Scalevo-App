@@ -61,8 +61,9 @@ export default function TanitimPage() {
 
       {/* NAVBAR */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2.5">
           <BrandIcon />
+          <span className="text-xl font-bold text-slate-900 tracking-tight">Scalevo</span>
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm text-slate-500 font-medium">
           <a href="#ozellikler" className="hover:text-slate-900 transition-colors">Özellikler</a>

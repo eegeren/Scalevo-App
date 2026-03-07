@@ -57,6 +57,7 @@ export default function KayitPage() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 flex-col justify-between p-12 text-white">
         <div className="flex items-center gap-3">
           <BrandIcon variant="glass" />
+          <span className="text-xl font-bold tracking-tight">Scalevo</span>
         </div>
 
         <div>
@@ -76,8 +77,9 @@ export default function KayitPage() {
       {/* Sağ panel */}
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center mb-8 justify-center">
+          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <BrandIcon />
+            <span className="text-xl font-bold text-slate-900">Scalevo</span>
           </div>
 
           <div className="mb-8">

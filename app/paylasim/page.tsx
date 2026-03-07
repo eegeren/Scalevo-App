@@ -52,8 +52,9 @@ export default function PaylasimPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/20 to-white flex flex-col">
       {/* Header */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white/80 backdrop-blur-sm">
-        <Link href="/tanitim" className="flex items-center">
+        <Link href="/tanitim" className="flex items-center gap-2">
           <BrandIcon size="sm" />
+          <span className="font-bold text-slate-800">Scalevo</span>
         </Link>
         <Link href="/kayit" className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors">
           Ücretsiz Dene →

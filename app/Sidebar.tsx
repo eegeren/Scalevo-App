@@ -61,13 +61,16 @@ export default function Sidebar({ user }: SidebarProps) {
 
   return (
     <aside className="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col p-6 shadow-sm sticky top-0 h-screen overflow-y-auto">
-      <div className="flex flex-col gap-1 mb-10 px-2">
-        <BrandIcon />
-        {storeName ? (
-          <p className="text-xs text-green-600 font-semibold truncate mt-1">🏪 {storeName}</p>
-        ) : (
-          <p className="text-xs text-slate-500 font-medium mt-1">Yönetim Paneli</p>
-        )}
+      <div className="flex items-center gap-3 mb-10 px-2">
+        <BrandIcon className="flex-shrink-0" />
+        <div className="min-w-0">
+          <h1 className="font-bold text-lg text-slate-900 tracking-tight">Scalevo</h1>
+          {storeName ? (
+            <p className="text-xs text-green-600 font-semibold truncate">🏪 {storeName}</p>
+          ) : (
+            <p className="text-xs text-slate-500 font-medium">Yönetim Paneli</p>
+          )}
+        </div>
       </div>
 
       <nav className="space-y-1.5">
