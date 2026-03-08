@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLang } from "@/lib/context/LanguageContext";
+import { translateText } from "@/lib/i18n/runtime";
 import {
   Package, Plus, Minus, Trash2, Edit3, Save, X, AlertTriangle,
   Search, RefreshCw, CheckCircle2, ChevronDown, BarChart3, ArrowUp, ArrowDown, Upload, Download
@@ -29,9 +31,20 @@ const EMPTY_FORM = {
   sale_price: "", stock: "", min_stock: "5", unit: "adet", notes: "",
 };
 
-const CATEGORIES = ["Elektronik", "Giyim", "Ev & Yaşam", "Kozmetik", "Spor", "Oyuncak", "Kitap", "Gıda", "Diğer"];
+const CATEGORIES = [
+  "Elektronik",
+  "Giyim",
+  "Ev & Ya\u015fam",
+  "Kozmetik",
+  "Spor",
+  "Oyuncak",
+  "Kitap",
+  "G\u0131da",
+  "Di\u011fer",
+];
 
 export default function StokPage() {
+  const { lang } = useLang();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -39,12 +52,13 @@ export default function StokPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
-  const [filterCategory, setFilterCategory] = useState("Tümü");
-  const [filterStok, setFilterStok] = useState("Tümü");
+  const [filterCategory, setFilterCategory] = useState("T\u00fcm\u00fc");
+  const [filterStok, setFilterStok] = useState("T\u00fcm\u00fc");
   const [adjustId, setAdjustId] = useState<number | null>(null);
   const [adjustQty, setAdjustQty] = useState("1");
   const [toast, setToast] = useState<string | null>(null);
   const [csvImporting, setCsvImporting] = useState(false);
+  const t = (value: string) => translateText(value, lang);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -291,17 +305,17 @@ export default function StokPage() {
           onChange={e => setFilterCategory(e.target.value)}
           className="h-9 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
-          <option>Tümü</option>
-          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          <option value={"T\u00fcm\u00fc"}>{t("T\u00fcm\u00fc")}</option>
+          {CATEGORIES.map(c => <option key={c} value={c}>{t(c)}</option>)}
         </select>
         <select
           value={filterStok}
           onChange={e => setFilterStok(e.target.value)}
           className="h-9 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
-          <option>Tümü</option>
-          <option>Kritik</option>
-          <option>Normal</option>
+          <option value={"T\u00fcm\u00fc"}>{t("T\u00fcm\u00fc")}</option>
+          <option value="Kritik">{t("Kritik")}</option>
+          <option value="Normal">{t("Normal")}</option>
         </select>
         <button onClick={loadProducts} className="h-9 w-9 flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -480,8 +494,8 @@ export default function StokPage() {
                     onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">Seç...</option>
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                    <option value="">{t("Se\u00e7...")}</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{t(c)}</option>)}
                   </select>
                 </div>
                 <div>
@@ -507,7 +521,7 @@ export default function StokPage() {
                     onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
                     className="w-full h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    {["adet", "kg", "litre", "metre", "paket", "kutu", "çift"].map(u => <option key={u}>{u}</option>)}
+                    {["adet", "kg", "litre", "metre", "paket", "kutu", "\u00e7ift"].map(u => <option key={u} value={u}>{t(u)}</option>)}
                   </select>
                 </div>
                 <div className="col-span-2">
@@ -560,3 +574,5 @@ function StatCard({ label, value, icon, color, highlight }: any) {
     </Card>
   );
 }
+
+

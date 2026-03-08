@@ -4,6 +4,7 @@ import "./globals.css";
 import AppShell from "./AppShell";
 import { createClient } from "@/lib/supabase/server";
 import { LanguageProvider } from "@/lib/context/LanguageContext";
+import LanguageSync from "@/components/LanguageSync";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,6 +50,7 @@ export default async function RootLayout({
     <html lang="tr">
       <body className={inter.className}>
         <LanguageProvider>
+          <LanguageSync />
           <AppShell user={appUser}>
             {children}
           </AppShell>
