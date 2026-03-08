@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import AppShell from "./AppShell";
 import { createClient } from "@/lib/supabase/server";
 import { LanguageProvider } from "@/lib/context/LanguageContext";
 import LanguageSync from "@/components/LanguageSync";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Scalevo — AI Destekli E-Ticaret Paneli",
@@ -39,8 +36,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const hasSupabaseEnv =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  const supabase = hasSupabaseEnv ? await createClient() : null;
+  const { data: { user } } = supabase
+    ? await supabase.auth.getUser()
+    : { data: { user: null } };
 
   const appUser = user
     ? { name: user.user_metadata?.name || user.email || "Kullanıcı", email: user.email || "" }
@@ -48,7 +51,7 @@ export default async function RootLayout({
 
   return (
     <html lang="tr">
-      <body className={inter.className}>
+      <body className="font-sans">
         <LanguageProvider>
           <LanguageSync />
           <AppShell user={appUser}>
