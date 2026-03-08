@@ -1,17 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, ShoppingBag, Sparkles, Menu, X,
-  Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut, ShieldCheck, Globe
+  LayoutDashboard,
+  ShoppingBag,
+  Sparkles,
+  Menu,
+  X,
+  Search,
+  TrendingUp,
+  Store,
+  Boxes,
+  Users,
+  Target,
+  Settings,
+  Scale,
+  LogOut,
+  ShieldCheck,
+  Globe,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import BrandIcon from "@/components/brand/BrandIcon";
 import { useLang } from "@/lib/context/LanguageContext";
+import { translateText } from "@/lib/i18n/runtime";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -44,9 +58,9 @@ const DRAWER_NAV = [
 
 export default function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { lang, toggle } = useLang();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const t = (value: string) => translateText(value, lang);
 
   const isAuthRoute =
     pathname === "/giris" ||
@@ -64,58 +78,58 @@ export default function AppShell({ children, user }: AppShellProps) {
     window.location.href = "/tanitim";
   };
 
+  const drawerItems = [
+    ...DRAWER_NAV,
+    ...(user && ADMIN_EMAILS_SHELL.includes(user.email?.toLowerCase())
+      ? [{ href: "/admin", icon: ShieldCheck, label: "Admin Paneli", badge: "Admin" }]
+      : []),
+  ];
+
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-800 font-sans">
-      {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar user={user} />
       </div>
 
-      {/* Mobile: Drawer Overlay */}
       {drawerOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setDrawerOpen(false)}
           />
-          {/* Drawer */}
-          <div className="absolute left-0 top-0 h-full w-72 bg-white shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+
+          <div className="absolute left-0 top-0 flex h-full w-72 flex-col bg-white shadow-2xl animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <div className="flex items-center gap-2.5">
                 <BrandIcon size="sm" />
                 <span className="font-bold text-slate-900">Scalevo</span>
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100"
               >
                 <X size={20} />
               </button>
             </div>
 
-            {/* Nav Links */}
-            <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5">
-              {[...DRAWER_NAV, ...(user && ADMIN_EMAILS_SHELL.includes(user.email?.toLowerCase()) ? [{ href: "/admin", icon: ShieldCheck, label: "Admin Paneli", badge: "Admin" }] : [])].map((item) => {
-                const active = item.href === "/"
-                  ? pathname === "/"
-                  : (pathname?.startsWith(item.href) ?? false);
+            <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-3">
+              {drawerItems.map((item) => {
+                const active = item.href === "/" ? pathname === "/" : (pathname?.startsWith(item.href) ?? false);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setDrawerOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
                       active
                         ? "bg-green-50 text-green-700"
                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <item.icon size={17} className={active ? "text-green-600" : "text-slate-400"} />
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                     {item.badge && !active && (
-                      <span className="ml-auto text-[10px] bg-green-100 text-green-700 font-bold px-1.5 py-0.5 rounded-full">
+                      <span className="ml-auto rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-700">
                         {item.badge}
                       </span>
                     )}
@@ -124,86 +138,79 @@ export default function AppShell({ children, user }: AppShellProps) {
               })}
             </nav>
 
-            {/* User + Logout */}
-            <div className="p-4 border-t border-slate-100 space-y-3">
+            <div className="space-y-3 border-t border-slate-100 p-4">
               {user && (
                 <div className="flex items-center gap-3 px-2">
-                  <div className="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-600">
                     {user.name?.slice(0, 1).toUpperCase() || "?"}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                    <p className="truncate text-sm font-semibold text-slate-800">{user.name}</p>
+                    <p className="truncate text-xs text-slate-400">{user.email}</p>
                   </div>
                 </div>
               )}
+
               <button
                 onClick={toggle}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+                className="flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-slate-500 transition-colors hover:bg-slate-50"
               >
-                <Globe size={15} /> {lang === "tr" ? "🇹🇷 Türkçe → EN" : "🇬🇧 English → TR"}
+                <Globe size={15} />
+                {lang === "tr" ? "Turkce -> EN" : "English -> TR"}
               </button>
+
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                className="flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50"
               >
-                <LogOut size={15} /> {lang === "tr" ? "Çıkış Yap" : "Sign Out"}
+                <LogOut size={15} />
+                {lang === "tr" ? "Cikis Yap" : "Sign Out"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Ana İçerik */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
-        {/* Mobile Top Bar */}
-        <header className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100 shadow-sm">
+      <div className="flex min-h-screen flex-1 flex-col overflow-x-hidden">
+        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3 shadow-sm md:hidden">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="p-2 hover:bg-slate-100 rounded-xl text-slate-600"
+            className="rounded-xl p-2 text-slate-600 hover:bg-slate-100"
           >
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2">
             <BrandIcon size="sm" />
-            <span className="font-bold text-slate-900 text-sm">Scalevo</span>
+            <span className="text-sm font-bold text-slate-900">Scalevo</span>
           </div>
           <button
             onClick={toggle}
-            className="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50"
           >
             <Globe size={12} />
             {lang === "tr" ? "EN" : "TR"}
           </button>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-4 pb-24 md:p-8 md:pb-8">{children}</main>
 
-        {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-lg">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-lg md:hidden">
           <div className="flex items-stretch">
             {BOTTOM_NAV.map((item) => {
-              const active = item.href === "/"
-                ? pathname === "/"
-                : (pathname?.startsWith(item.href) ?? false);
+              const active = item.href === "/" ? pathname === "/" : (pathname?.startsWith(item.href) ?? false);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors ${
+                  className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
                     active ? "text-green-600" : "text-slate-400 hover:text-slate-600"
                   }`}
                 >
                   <item.icon size={20} className={active ? "text-green-600" : ""} />
                   <span className={`text-[10px] font-semibold ${active ? "text-green-600" : ""}`}>
-                    {item.label}
+                    {t(item.label)}
                   </span>
-                  {active && (
-                    <div className="w-6 h-0.5 bg-green-500 rounded-full" />
-                  )}
+                  {active && <div className="h-0.5 w-6 rounded-full bg-green-500" />}
                 </Link>
               );
             })}
