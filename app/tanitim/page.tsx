@@ -6,7 +6,7 @@ import { useLang } from "@/lib/context/LanguageContext";
 import {
   Zap, ShoppingBag, BrainCircuit,
   CheckCircle, ArrowRight, Star, Sparkles,
-  Users, Shield, Boxes, Rocket, Crown, Globe
+  Users, Shield, Boxes, Rocket, Crown
 } from "lucide-react";
 import BrandIcon from "@/components/brand/BrandIcon";
 
@@ -180,7 +180,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
 }
 
 export default function TanitimPage() {
-  const { lang, toggle } = useLang();
+  const { lang } = useLang();
   const t = translations[lang];
 
   return (
@@ -221,13 +221,6 @@ export default function TanitimPage() {
         </div>
         <div className="flex items-center gap-2">
           {/* Dil Değiştirici */}
-          <button
-            onClick={toggle}
-            className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all"
-          >
-            <Globe size={13} />
-            {lang === "tr" ? "EN" : "TR"}
-          </button>
           <Link href="/giris" className="text-sm font-medium text-slate-600 hover:text-slate-900 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors">
             {t.nav.login}
           </Link>

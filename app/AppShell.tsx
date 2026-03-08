@@ -19,7 +19,6 @@ import {
   Scale,
   LogOut,
   ShieldCheck,
-  Globe,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Sidebar from "./Sidebar";
@@ -58,7 +57,7 @@ const DRAWER_NAV = [
 
 export default function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
-  const { lang, toggle } = useLang();
+  const { lang } = useLang();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const t = (value: string) => translateText(value, lang);
 
@@ -152,14 +151,6 @@ export default function AppShell({ children, user }: AppShellProps) {
               )}
 
               <button
-                onClick={toggle}
-                className="flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-slate-500 transition-colors hover:bg-slate-50"
-              >
-                <Globe size={15} />
-                {lang === "tr" ? "Turkce -> EN" : "English -> TR"}
-              </button>
-
-              <button
                 onClick={handleLogout}
                 className="flex w-full items-center gap-2 rounded-xl px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50"
               >
@@ -183,13 +174,7 @@ export default function AppShell({ children, user }: AppShellProps) {
             <BrandIcon size="sm" />
             <span className="text-sm font-bold text-slate-900">Scalevo</span>
           </div>
-          <button
-            onClick={toggle}
-            className="flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50"
-          >
-            <Globe size={12} />
-            {lang === "tr" ? "EN" : "TR"}
-          </button>
+          <div className="w-8" />
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 pb-24 md:p-8 md:pb-8">{children}</main>
