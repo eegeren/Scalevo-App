@@ -11,24 +11,122 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import SifirdanWizard from "./SifirdanWizard"
+import { useLang } from "@/lib/context/LanguageContext";
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Günaydın";
-  if (hour < 18) return "İyi Günler";
-  return "İyi Akşamlar";
-}
+const pageLabels = {
+  tr: {
+    greetings: ["Günaydın", "İyi Günler", "İyi Akşamlar"],
+    welcome: "Hoş Geldin",
+    panelReady: "Panelin seni bekliyor.",
+    dateLocale: "tr-TR",
+    startBanner: {
+      eyebrow: "Yeni başlıyor musun?",
+      title: "0'dan Mağaza Kur 🚀",
+      sub: "Niş · Ürün · Logo · Reklam Metni — hepsi AI ile 2 dakikada",
+      btn: "Başlat",
+    },
+    stats: ["Toplam Analiz", "Toplam Sipariş", "Bekleyen Sipariş", "Toplam Ciro"],
+    analysis: {
+      title: "Ürün Fikri Doğrulama",
+      sub: "Kategori seç, ürün adını gir — AI ile potansiyelini ölç.",
+      placeholder: "Önce kategori seç veya direkt ürün yaz...",
+      btn: "Analiz Et",
+      loading: "Hesaplanıyor...",
+      examplePrefix: "Örn:",
+    },
+    result: {
+      scoreTitle: "Satılabilirlik Skoru",
+      marketTitle: "Pazar Verileri",
+      competition: "Rekabet",
+      avgPrice: "Ort. Fiyat",
+      shipping: "Kargo",
+      trendType: "Trend Tipi",
+      aiAdvice: "AI Tavsiyesi",
+      share: "Paylaş",
+      copied: "Kopyalandı!",
+      profitTitle: "Kâr Hesaplayıcı",
+      profitSub: "— alış fiyatını gir, net kârı gör",
+      buyPrice: "Alış Fiyatı (₺)",
+      sellPrice: "Satış Fiyatı (₺)",
+      shippingCost: "Kargo Maliyeti (₺)",
+      platform: "Platform",
+      commission: "Komisyon",
+      serviceFee: "Hizmet Bedeli",
+      shippingLabel: "Kargo",
+      buyCost: "Alış Maliyeti",
+      netProfit: "Net Kâr",
+      profitMargin: "Kâr Marjı",
+      warnLoss: "⚠️ Bu fiyatla zarar ediyorsun — satış fiyatını artır veya alış maliyetini düşür.",
+      warnLow: "⚠️ Marj düşük (%10 altı). Ölçeklenmesi zorlaşabilir.",
+      warnGood: "✅ Sağlıklı bir kâr marjı!",
+      upgradeLink: "Pro'ya Geç →",
+    },
+    status: { new: "Yeni", preparing: "Hazırlanıyor", shipped: "Kargoda", completed: "Tamamlandı" },
+    recentOrders: "Son Siparişler",
+    recentAnalyses: "Son Analizler",
+    viewAll: "Tümünü gör",
+    noOrders: "Henüz sipariş yok.",
+    noAnalyses: "Henüz analiz yapılmadı.",
+  },
+  en: {
+    greetings: ["Good Morning", "Good Afternoon", "Good Evening"],
+    welcome: "Welcome",
+    panelReady: "Your dashboard is ready.",
+    dateLocale: "en-US",
+    startBanner: {
+      eyebrow: "Just getting started?",
+      title: "Build a Store from Scratch 🚀",
+      sub: "Niche · Product · Logo · Ad Copy — all with AI in 2 minutes",
+      btn: "Start",
+    },
+    stats: ["Total Analyses", "Total Orders", "Pending Orders", "Total Revenue"],
+    analysis: {
+      title: "Product Idea Validation",
+      sub: "Select a category, enter a product name — measure its potential with AI.",
+      placeholder: "Select a category first or type a product...",
+      btn: "Analyze",
+      loading: "Calculating...",
+      examplePrefix: "E.g.:",
+    },
+    result: {
+      scoreTitle: "Sellability Score",
+      marketTitle: "Market Data",
+      competition: "Competition",
+      avgPrice: "Avg. Price",
+      shipping: "Shipping",
+      trendType: "Trend Type",
+      aiAdvice: "AI Advice",
+      share: "Share",
+      copied: "Copied!",
+      profitTitle: "Profit Calculator",
+      profitSub: "— enter purchase price to see net profit",
+      buyPrice: "Purchase Price (₺)",
+      sellPrice: "Selling Price (₺)",
+      shippingCost: "Shipping Cost (₺)",
+      platform: "Platform",
+      commission: "Commission",
+      serviceFee: "Service Fee",
+      shippingLabel: "Shipping",
+      buyCost: "Purchase Cost",
+      netProfit: "Net Profit",
+      profitMargin: "Profit Margin",
+      warnLoss: "⚠️ You're losing money at this price — raise the selling price or cut costs.",
+      warnLow: "⚠️ Low margin (below 10%). Hard to scale.",
+      warnGood: "✅ Healthy profit margin!",
+      upgradeLink: "Go Pro →",
+    },
+    status: { new: "New", preparing: "Preparing", shipped: "Shipped", completed: "Completed" },
+    recentOrders: "Recent Orders",
+    recentAnalyses: "Recent Analyses",
+    viewAll: "View all",
+    noOrders: "No orders yet.",
+    noAnalyses: "No analyses yet.",
+  },
+} as const;
 
 function getInitials(name: string) {
   return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 }
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  new: { label: "Yeni", color: "bg-green-100 text-green-700" },
-  preparing: { label: "Hazırlanıyor", color: "bg-orange-100 text-orange-700" },
-  shipped: { label: "Kargoda", color: "bg-blue-100 text-blue-700" },
-  completed: { label: "Tamamlandı", color: "bg-slate-100 text-slate-600" },
-};
 
 const KOMISYON_ORANLARI: Record<string, number> = {
   elektronik: 10, giyim: 20, "ev-yasam": 15, "evcil-hayvan": 15,
@@ -47,6 +145,23 @@ const KATEGORILER = [
 ];
 
 export default function Home() {
+  const { lang } = useLang();
+  const t = pageLabels[lang];
+
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    new: { label: t.status.new, color: "bg-green-100 text-green-700" },
+    preparing: { label: t.status.preparing, color: "bg-orange-100 text-orange-700" },
+    shipped: { label: t.status.shipped, color: "bg-blue-100 text-blue-700" },
+    completed: { label: t.status.completed, color: "bg-slate-100 text-slate-600" },
+  };
+
+  const greeting = (() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t.greetings[0];
+    if (hour < 18) return t.greetings[1];
+    return t.greetings[2];
+  })();
+
   const [query, setQuery] = useState("");
   const [kategori, setKategori] = useState("");
   const [loading, setLoading] = useState(false);
@@ -186,9 +301,9 @@ export default function Home() {
             </div>
           )}
           <div>
-            <p className="text-slate-500 text-sm font-medium">{getGreeting()},</p>
+            <p className="text-slate-500 text-sm font-medium">{greeting},</p>
             <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
-              {user ? user.name.split(" ")[0] : "Hoş Geldin"} 👋
+              {user ? user.name.split(" ")[0] : t.welcome} 👋
             </h2>
             {storeInfo && (
               <div className="flex items-center gap-1.5 mt-1">
@@ -209,9 +324,9 @@ export default function Home() {
         </div>
         <div className="text-right hidden md:block">
           <p className="text-xs text-slate-400 font-medium">
-            {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+            {new Date().toLocaleDateString(t.dateLocale, { weekday: "long", day: "numeric", month: "long" })}
           </p>
-          <p className="text-sm text-slate-500 mt-0.5">Panelin seni bekliyor.</p>
+          <p className="text-sm text-slate-500 mt-0.5">{t.panelReady}</p>
         </div>
       </header>
 
@@ -221,7 +336,6 @@ export default function Home() {
         style={{ background: "linear-gradient(135deg, #16a34a 0%, #0d9488 60%, #0891b2 100%)" }}
         onClick={() => setWizardOpen(true)}
       >
-        {/* Dekoratif daireler */}
         <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute -right-4 top-8 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute right-24 -bottom-6 w-20 h-20 rounded-full bg-white/5 pointer-events-none" />
@@ -232,16 +346,14 @@ export default function Home() {
               <Rocket size={24} className="text-white" />
             </div>
             <div>
-              <p className="text-white/80 text-xs font-medium mb-0.5">Yeni başlıyor musun?</p>
-              <h3 className="text-white font-black text-lg md:text-xl leading-tight">0&apos;dan Mağaza Kur 🚀</h3>
-              <p className="text-white/70 text-xs mt-0.5 hidden sm:block">
-                Niş · Ürün · Logo · Reklam Metni — hepsi AI ile 2 dakikada
-              </p>
+              <p className="text-white/80 text-xs font-medium mb-0.5">{t.startBanner.eyebrow}</p>
+              <h3 className="text-white font-black text-lg md:text-xl leading-tight">{t.startBanner.title}</h3>
+              <p className="text-white/70 text-xs mt-0.5 hidden sm:block">{t.startBanner.sub}</p>
             </div>
           </div>
           <div className="flex-shrink-0">
             <div className="bg-white text-green-700 font-bold text-sm px-4 py-2.5 rounded-xl shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-200 flex items-center gap-2">
-              Başlat <ArrowUpRight size={15} />
+              {t.startBanner.btn} <ArrowUpRight size={15} />
             </div>
           </div>
         </div>
@@ -249,10 +361,10 @@ export default function Home() {
 
       {/* HIZLI İSTATİSTİK KARTLARI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <QuickStat label="Toplam Analiz" value={stats.analyses} icon={<BarChart2 size={18} className="text-green-500" />} color="bg-green-50" />
-        <QuickStat label="Toplam Sipariş" value={stats.orders} icon={<ShoppingBag size={18} className="text-emerald-500" />} color="bg-emerald-50" />
-        <QuickStat label="Bekleyen Sipariş" value={stats.pendingOrders} icon={<Clock size={18} className="text-orange-500" />} color="bg-orange-50" highlight={stats.pendingOrders > 0} />
-        <QuickStat label="Toplam Ciro" value={`${stats.revenue.toLocaleString("tr-TR")} ₺`} icon={<TrendingUp size={18} className="text-green-500" />} color="bg-green-50" />
+        <QuickStat label={t.stats[0]} value={stats.analyses} icon={<BarChart2 size={18} className="text-green-500" />} color="bg-green-50" />
+        <QuickStat label={t.stats[1]} value={stats.orders} icon={<ShoppingBag size={18} className="text-emerald-500" />} color="bg-emerald-50" />
+        <QuickStat label={t.stats[2]} value={stats.pendingOrders} icon={<Clock size={18} className="text-orange-500" />} color="bg-orange-50" highlight={stats.pendingOrders > 0} />
+        <QuickStat label={t.stats[3]} value={`${stats.revenue.toLocaleString("tr-TR")} ₺`} icon={<TrendingUp size={18} className="text-green-500" />} color="bg-green-50" />
       </div>
 
       {/* ANALİZ BÖLÜMÜ */}
@@ -260,10 +372,9 @@ export default function Home() {
         <div className="h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-400"></div>
         <CardContent className="p-5 md:p-8">
           <div className="max-w-2xl mx-auto text-center space-y-4 md:space-y-5">
-            <h4 className="text-xl md:text-2xl font-semibold text-slate-700">Ürün Fikri Doğrulama</h4>
-            <p className="text-slate-500 text-sm md:text-base">Kategori seç, ürün adını gir — AI ile potansiyelini ölç.</p>
+            <h4 className="text-xl md:text-2xl font-semibold text-slate-700">{t.analysis.title}</h4>
+            <p className="text-slate-500 text-sm md:text-base">{t.analysis.sub}</p>
 
-            {/* Kategori Seçici */}
             <div className="flex flex-wrap gap-2 justify-center">
               {KATEGORILER.map(k => (
                 <button
@@ -280,7 +391,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Kategori örnekleri */}
             {kategori && (
               <div className="flex flex-wrap gap-1.5 justify-center">
                 {KATEGORILER.find(k => k.id === kategori)?.ornekler.map(ornek => (
@@ -299,8 +409,8 @@ export default function Home() {
               <Input
                 placeholder={
                   kategori
-                    ? `Örn: ${KATEGORILER.find(k => k.id === kategori)?.ornekler[0] ?? "Ürün adı"}`
-                    : "Önce kategori seç veya direkt ürün yaz..."
+                    ? `${t.analysis.examplePrefix} ${KATEGORILER.find(k => k.id === kategori)?.ornekler[0] ?? ""}`
+                    : t.analysis.placeholder
                 }
                 className="h-11 md:h-12 text-base px-4 border-slate-200 focus-visible:ring-green-500 shadow-sm flex-1"
                 value={query}
@@ -313,7 +423,7 @@ export default function Home() {
                 onClick={handleAnalyze}
                 disabled={loading || !query}
               >
-                {loading ? "Hesaplanıyor..." : "Analiz Et"}
+                {loading ? t.analysis.loading : t.analysis.btn}
               </Button>
             </div>
           </div>
@@ -325,7 +435,7 @@ export default function Home() {
           <span>{error}</span>
           {error.includes('⚠️') && (
             <Link href="/upgrade" className="flex-shrink-0 text-xs font-bold bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition-colors">
-              Pro&apos;ya Geç →
+              {t.result.upgradeLink}
             </Link>
           )}
         </div>
@@ -336,7 +446,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="border-green-100 bg-green-50/50 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-green-900">Satılabilirlik Skoru</CardTitle>
+                <CardTitle className="text-sm font-medium text-green-900">{t.result.scoreTitle}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-baseline gap-2">
@@ -351,13 +461,13 @@ export default function Home() {
 
             <Card className="md:col-span-2 border-slate-200 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">Pazar Verileri</CardTitle>
+                <CardTitle className="text-sm font-medium text-slate-500">{t.result.marketTitle}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <DetailBox label="Rekabet" value={result.competition} icon={<AlertCircle size={16} className="text-orange-500"/>} />
-                <DetailBox label="Ort. Fiyat" value={result.priceRange} icon={<DollarSign size={16} className="text-green-500"/>} />
-                <DetailBox label="Kargo" value={result.shippingDifficulty} icon={<Package size={16} className="text-blue-500"/>} />
-                <DetailBox label="Trend Tipi" value={result.trend} icon={<TrendingUp size={16} className="text-emerald-500"/>} />
+                <DetailBox label={t.result.competition} value={result.competition} icon={<AlertCircle size={16} className="text-orange-500"/>} />
+                <DetailBox label={t.result.avgPrice} value={result.priceRange} icon={<DollarSign size={16} className="text-green-500"/>} />
+                <DetailBox label={t.result.shipping} value={result.shippingDifficulty} icon={<Package size={16} className="text-blue-500"/>} />
+                <DetailBox label={t.result.trendType} value={result.trend} icon={<TrendingUp size={16} className="text-emerald-500"/>} />
               </CardContent>
             </Card>
 
@@ -367,7 +477,7 @@ export default function Home() {
                   <BrainCircuit size={20} />
                 </div>
                 <div className="flex-1">
-                  <h5 className="font-semibold text-slate-800 mb-1">AI Tavsiyesi</h5>
+                  <h5 className="font-semibold text-slate-800 mb-1">{t.result.aiAdvice}</h5>
                   <p className="text-slate-600 text-sm leading-relaxed">{result.suggestion}</p>
                 </div>
                 <button
@@ -377,10 +487,11 @@ export default function Home() {
                   }`}
                   title="Paylaşım linkini kopyala"
                 >
-                  {copied ? <><Check size={13} /> Kopyalandı!</> : <><Share2 size={13} /> Paylaş</>}
+                  {copied ? <><Check size={13} /> {t.result.copied}</> : <><Share2 size={13} /> {t.result.share}</>}
                 </button>
               </CardContent>
             </Card>
+
             {/* KÂR HESAPLAYICI */}
             <Card className="md:col-span-3 border-slate-200 shadow-sm overflow-hidden">
               <button
@@ -397,8 +508,8 @@ export default function Home() {
                   <div className="p-1.5 bg-emerald-100 rounded-lg text-emerald-600">
                     <Calculator size={16} />
                   </div>
-                  <span className="font-semibold text-slate-800 text-sm">Kâr Hesaplayıcı</span>
-                  <span className="text-xs text-slate-400">— alış fiyatını gir, net kârı gör</span>
+                  <span className="font-semibold text-slate-800 text-sm">{t.result.profitTitle}</span>
+                  <span className="text-xs text-slate-400">{t.result.profitSub}</span>
                 </div>
                 <ChevronDown size={16} className={`text-slate-400 transition-transform ${showKar ? "rotate-180" : ""}`} />
               </button>
@@ -419,23 +530,23 @@ export default function Home() {
                   <div className="border-t border-slate-100 p-4 space-y-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
-                        <label className="text-xs text-slate-500 font-medium block mb-1">Alış Fiyatı (₺)</label>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">{t.result.buyPrice}</label>
                         <input
-                          type="number" placeholder="örn: 120"
+                          type="number" placeholder="120"
                           value={alisF} onChange={e => setAlisF(e.target.value)}
                           className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-slate-500 font-medium block mb-1">Satış Fiyatı (₺)</label>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">{t.result.sellPrice}</label>
                         <input
-                          type="number" placeholder="örn: 299"
+                          type="number" placeholder="299"
                           value={satisFiyat} onChange={e => setSatisFiyat(e.target.value)}
                           className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-slate-500 font-medium block mb-1">Kargo Maliyeti (₺)</label>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">{t.result.shippingCost}</label>
                         <input
                           type="number" placeholder="25"
                           value={kargoMaliyet} onChange={e => setKargoMaliyet(e.target.value)}
@@ -443,7 +554,7 @@ export default function Home() {
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-slate-500 font-medium block mb-1">Platform</label>
+                        <label className="text-xs text-slate-500 font-medium block mb-1">{t.result.platform}</label>
                         <select
                           value={karPlatform} onChange={e => setKarPlatform(e.target.value)}
                           className="w-full h-9 px-3 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
@@ -458,43 +569,37 @@ export default function Home() {
                       <div className="bg-slate-50 rounded-xl p-4 space-y-3">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                           <div className="bg-white rounded-lg p-3 border border-slate-100">
-                            <p className="text-xs text-slate-400 mb-1">Komisyon ({komisyon}%)</p>
+                            <p className="text-xs text-slate-400 mb-1">{t.result.commission} ({komisyon}%)</p>
                             <p className="font-bold text-slate-700">-{komisyonTutari.toFixed(0)}₺</p>
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-slate-100">
-                            <p className="text-xs text-slate-400 mb-1">Hizmet Bedeli</p>
+                            <p className="text-xs text-slate-400 mb-1">{t.result.serviceFee}</p>
                             <p className="font-bold text-slate-700">-{hizmetBedeli.toFixed(0)}₺</p>
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-slate-100">
-                            <p className="text-xs text-slate-400 mb-1">Kargo</p>
+                            <p className="text-xs text-slate-400 mb-1">{t.result.shippingLabel}</p>
                             <p className="font-bold text-slate-700">-{kargo.toFixed(0)}₺</p>
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-slate-100">
-                            <p className="text-xs text-slate-400 mb-1">Alış Maliyeti</p>
+                            <p className="text-xs text-slate-400 mb-1">{t.result.buyCost}</p>
                             <p className="font-bold text-slate-700">-{alis.toFixed(0)}₺</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between p-3 bg-white rounded-xl border-2 border-slate-200">
                           <div>
-                            <p className="text-xs text-slate-400">Net Kâr</p>
+                            <p className="text-xs text-slate-400">{t.result.netProfit}</p>
                             <p className={`text-2xl font-black ${karRenk}`}>{kar.toFixed(0)}₺</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-slate-400 mb-1">Kâr Marjı</p>
+                            <p className="text-xs text-slate-400 mb-1">{t.result.profitMargin}</p>
                             <span className={`text-lg font-black px-3 py-1 rounded-lg ${marjRenk}`}>
                               %{Math.abs(marj).toFixed(1)}
                             </span>
                           </div>
                         </div>
-                        {kar < 0 && (
-                          <p className="text-xs text-red-500 text-center">⚠️ Bu fiyatla zarar ediyorsun — satış fiyatını artır veya alış maliyetini düşür.</p>
-                        )}
-                        {kar > 0 && marj < 10 && (
-                          <p className="text-xs text-orange-500 text-center">⚠️ Marj düşük (%10 altı). Ölçeklenmesi zorlaşabilir.</p>
-                        )}
-                        {kar > 0 && marj >= 10 && (
-                          <p className="text-xs text-green-600 text-center">✅ Sağlıklı bir kâr marjı!</p>
-                        )}
+                        {kar < 0 && <p className="text-xs text-red-500 text-center">{t.result.warnLoss}</p>}
+                        {kar > 0 && marj < 10 && <p className="text-xs text-orange-500 text-center">{t.result.warnLow}</p>}
+                        {kar > 0 && marj >= 10 && <p className="text-xs text-green-600 text-center">{t.result.warnGood}</p>}
                       </div>
                     )}
                   </div>
@@ -510,17 +615,17 @@ export default function Home() {
         <Card className="border-slate-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-100">
             <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
-              <ShoppingBag size={16} className="text-green-600" /> Son Siparişler
+              <ShoppingBag size={16} className="text-green-600" /> {t.recentOrders}
             </CardTitle>
             <Link href="/operasyonlar" className="text-xs text-green-600 hover:text-green-700 font-medium flex items-center gap-1">
-              Tümünü gör <ArrowUpRight size={13} />
+              {t.viewAll} <ArrowUpRight size={13} />
             </Link>
           </CardHeader>
           <CardContent className="pt-4">
             {recentOrders.length === 0 ? (
               <div className="text-center py-8 text-slate-400">
                 <ShoppingBag size={32} className="mx-auto mb-2 text-slate-200" />
-                <p className="text-sm">Henüz sipariş yok.</p>
+                <p className="text-sm">{t.noOrders}</p>
               </div>
             ) : (
               <div className="space-y-1 divide-y divide-slate-50">
@@ -547,17 +652,17 @@ export default function Home() {
         <Card className="border-slate-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-slate-100">
             <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
-              <BarChart2 size={16} className="text-green-600" /> Son Analizler
+              <BarChart2 size={16} className="text-green-600" /> {t.recentAnalyses}
             </CardTitle>
             <Link href="/analiz" className="text-xs text-green-600 hover:text-green-700 font-medium flex items-center gap-1">
-              Tümünü gör <ArrowUpRight size={13} />
+              {t.viewAll} <ArrowUpRight size={13} />
             </Link>
           </CardHeader>
           <CardContent className="pt-4">
             {recentAnalyses.length === 0 ? (
               <div className="text-center py-8 text-slate-400">
                 <BarChart2 size={32} className="mx-auto mb-2 text-slate-200" />
-                <p className="text-sm">Henüz analiz yapılmadı.</p>
+                <p className="text-sm">{t.noAnalyses}</p>
               </div>
             ) : (
               <div className="space-y-1 divide-y divide-slate-50">
@@ -566,7 +671,7 @@ export default function Home() {
                     <div className="flex-1 min-w-0 mr-3">
                       <p className="text-sm font-medium text-slate-800 truncate">{a.product_name}</p>
                       <p className="text-xs text-slate-500">
-                        {new Date(a.created_at).toLocaleDateString("tr-TR", { day: "numeric", month: "long" })}
+                        {new Date(a.created_at).toLocaleDateString(t.dateLocale, { day: "numeric", month: "long" })}
                       </p>
                     </div>
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${

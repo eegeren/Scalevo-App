@@ -3,10 +3,46 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { BarChart2, ShoppingBag, TrendingUp } from "lucide-react";
+import { BarChart2, ShoppingBag, TrendingUp, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BrandIcon from "@/components/brand/BrandIcon";
+import { useLang } from "@/lib/context/LanguageContext";
+
+const labels = {
+  tr: {
+    tagline: ["E-Ticaretinizi", "bir üst seviyeye", "taşıyın."],
+    features: ["Yapay zeka destekli ürün analizi", "Sipariş ve operasyon yönetimi", "Gelir ve karlılık takibi"],
+    copyright: "© 2026 Scalevo. Tüm hakları saklıdır.",
+    title: "Tekrar Hoş Geldiniz",
+    subtitle: "Hesabınıza giriş yapın.",
+    email: "E-posta",
+    password: "Şifre",
+    loginBtn: "Giriş Yap",
+    loggingIn: "Giriş yapılıyor...",
+    noAccount: "Hesabın yok mu?",
+    register: "Kayıt Ol",
+    errFields: "Lütfen tüm alanları doldurun.",
+    errAuth: "E-posta veya şifre hatalı.",
+    langToggle: "EN",
+  },
+  en: {
+    tagline: ["Take your e-commerce", "to the next", "level."],
+    features: ["AI-powered product analysis", "Order and operations management", "Revenue and profitability tracking"],
+    copyright: "© 2026 Scalevo. All rights reserved.",
+    title: "Welcome Back",
+    subtitle: "Sign in to your account.",
+    email: "Email",
+    password: "Password",
+    loginBtn: "Sign In",
+    loggingIn: "Signing in...",
+    noAccount: "Don't have an account?",
+    register: "Sign Up",
+    errFields: "Please fill in all fields.",
+    errAuth: "Invalid email or password.",
+    langToggle: "TR",
+  },
+} as const;
 
 export default function GirisPage() {
   const [email, setEmail] = useState("");
@@ -14,10 +50,12 @@ export default function GirisPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { lang, toggle } = useLang();
+  const t = labels[lang];
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError("Lütfen tüm alanları doldurun.");
+      setError(t.errFields);
       return;
     }
     setLoading(true);
@@ -28,7 +66,7 @@ export default function GirisPage() {
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (authError) {
-      setError("E-posta veya şifre hatalı.");
+      setError(t.errAuth);
       setLoading(false);
       return;
     }
@@ -48,20 +86,28 @@ export default function GirisPage() {
 
         <div>
           <h2 className="text-4xl font-bold leading-tight mb-6">
-            E-Ticaretinizi<br />bir üst seviyeye<br />taşıyın.
+            {t.tagline[0]}<br />{t.tagline[1]}<br />{t.tagline[2]}
           </h2>
           <div className="space-y-4">
-            <Feature icon={<BarChart2 size={18} />} text="Yapay zeka destekli ürün analizi" />
-            <Feature icon={<ShoppingBag size={18} />} text="Sipariş ve operasyon yönetimi" />
-            <Feature icon={<TrendingUp size={18} />} text="Gelir ve karlılık takibi" />
+            <Feature icon={<BarChart2 size={18} />} text={t.features[0]} />
+            <Feature icon={<ShoppingBag size={18} />} text={t.features[1]} />
+            <Feature icon={<TrendingUp size={18} />} text={t.features[2]} />
           </div>
         </div>
 
-        <p className="text-green-200 text-sm">© 2026 Scalevo. Tüm hakları saklıdır.</p>
+        <p className="text-green-200 text-sm">{t.copyright}</p>
       </div>
 
       {/* Sağ panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
+      <div className="flex-1 flex items-center justify-center p-8 bg-slate-50 relative">
+        <button
+          onClick={toggle}
+          className="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+        >
+          <Globe size={13} />
+          {t.langToggle}
+        </button>
+
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <BrandIcon />
@@ -69,13 +115,13 @@ export default function GirisPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Tekrar Hoş Geldiniz</h1>
-            <p className="text-slate-500 mt-2">Hesabınıza giriş yapın.</p>
+            <h1 className="text-3xl font-bold text-slate-900">{t.title}</h1>
+            <p className="text-slate-500 mt-2">{t.subtitle}</p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">E-posta</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t.email}</label>
               <Input
                 type="email"
                 placeholder="ornek@email.com"
@@ -87,7 +133,7 @@ export default function GirisPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Şifre</label>
+              <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t.password}</label>
               <Input
                 type="password"
                 placeholder="••••••••"
@@ -107,13 +153,13 @@ export default function GirisPage() {
               onClick={handleLogin}
               disabled={loading}
             >
-              {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+              {loading ? t.loggingIn : t.loginBtn}
             </Button>
 
             <p className="text-center text-sm text-slate-500 pt-1">
-              Hesabın yok mu?{" "}
+              {t.noAccount}{" "}
               <Link href="/kayit" className="text-green-600 hover:text-green-700 font-semibold">
-                Kayıt Ol
+                {t.register}
               </Link>
             </p>
           </div>
