@@ -2,18 +2,21 @@
 
 import { useState, useEffect } from "react";
 
+export type PlanType = "free" | "pro" | "max";
+
 export interface PlanInfo {
-  plan: "free" | "pro";
-  isPro: boolean;
+  plan: PlanType;
+  isPro: boolean;   // pro veya max
+  isMax: boolean;   // sadece max
   analysisUsed: number;
   analysisLimit: number;
   canAnalyze: boolean;
-  stockLimit: number; // free: 50, pro: unlimited (999999)
+  stockLimit: number; // free: 50, pro: 500, max: unlimited
   loading: boolean;
 }
 
 export function usePlan(): PlanInfo {
-  const [plan, setPlan] = useState<"free" | "pro">("free");
+  const [plan, setPlan] = useState<PlanType>("free");
   const [analysisUsed, setAnalysisUsed] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -32,11 +35,11 @@ export function usePlan(): PlanInfo {
           .eq("user_id", user.id)
           .single();
 
-        const currentPlan: "free" | "pro" = sub?.plan || "free";
+        const currentPlan: PlanType = sub?.plan || "free";
         setPlan(currentPlan);
 
-        // Bu ayki analiz sayısı (sadece free için önemli)
-        if (currentPlan === "free") {
+        // Bu ayki analiz sayısı (sadece free ve pro için önemli)
+        if (currentPlan !== "max") {
           const startOfMonth = new Date();
           startOfMonth.setDate(1);
           startOfMonth.setHours(0, 0, 0, 0);
@@ -54,16 +57,18 @@ export function usePlan(): PlanInfo {
     load();
   }, []);
 
-  const isPro = plan === "pro";
-  const analysisLimit = 20;
+  const isMax = plan === "max";
+  const isPro = plan === "pro" || plan === "max";
+  const analysisLimit = plan === "max" ? 999999 : plan === "pro" ? 100 : 20;
 
   return {
     plan,
     isPro,
+    isMax,
     analysisUsed,
     analysisLimit,
-    canAnalyze: isPro || analysisUsed < analysisLimit,
-    stockLimit: isPro ? 999999 : 50,
+    canAnalyze: isMax || analysisUsed < analysisLimit,
+    stockLimit: isMax ? 999999 : isPro ? 500 : 50,
     loading,
   };
 }
