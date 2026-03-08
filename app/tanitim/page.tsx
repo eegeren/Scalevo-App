@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, ReactNode } from "react";
+import { useLang } from "@/lib/context/LanguageContext";
 import {
   Zap, ShoppingBag, BrainCircuit,
   CheckCircle, ArrowRight, Star, Sparkles,
@@ -153,7 +154,6 @@ const translations = {
   },
 } as const;
 
-type Lang = keyof typeof translations;
 
 /* ── Scroll Reveal ── */
 function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) {
@@ -180,7 +180,7 @@ function Reveal({ children, delay = 0, className = "" }: { children: ReactNode; 
 }
 
 export default function TanitimPage() {
-  const [lang, setLang] = useState<Lang>("tr");
+  const { lang, toggle } = useLang();
   const t = translations[lang];
 
   return (
@@ -222,7 +222,7 @@ export default function TanitimPage() {
         <div className="flex items-center gap-2">
           {/* Dil Değiştirici */}
           <button
-            onClick={() => setLang(lang === "tr" ? "en" : "tr")}
+            onClick={toggle}
             className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all"
           >
             <Globe size={13} />

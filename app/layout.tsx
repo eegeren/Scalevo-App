@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AppShell from "./AppShell";
 import { createClient } from "@/lib/supabase/server";
+import { LanguageProvider } from "@/lib/context/LanguageContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,9 +48,11 @@ export default async function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <AppShell user={appUser}>
-          {children}
-        </AppShell>
+        <LanguageProvider>
+          <AppShell user={appUser}>
+            {children}
+          </AppShell>
+        </LanguageProvider>
       </body>
     </html>
   );

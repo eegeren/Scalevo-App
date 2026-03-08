@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, ShoppingBag, Sparkles, Menu, X,
-  Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut, ShieldCheck
+  Search, TrendingUp, Store, Boxes, Users, Target, Settings, Scale, LogOut, ShieldCheck, Globe
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import BrandIcon from "@/components/brand/BrandIcon";
+import { useLang } from "@/lib/context/LanguageContext";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ const DRAWER_NAV = [
 export default function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { lang, toggle } = useLang();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const isAuthRoute =
@@ -136,10 +138,16 @@ export default function AppShell({ children, user }: AppShellProps) {
                 </div>
               )}
               <button
+                onClick={toggle}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+              >
+                <Globe size={15} /> {lang === "tr" ? "🇹🇷 Türkçe → EN" : "🇬🇧 English → TR"}
+              </button>
+              <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors"
               >
-                <LogOut size={15} /> Çıkış Yap
+                <LogOut size={15} /> {lang === "tr" ? "Çıkış Yap" : "Sign Out"}
               </button>
             </div>
           </div>
@@ -160,7 +168,13 @@ export default function AppShell({ children, user }: AppShellProps) {
             <BrandIcon size="sm" />
             <span className="font-bold text-slate-900 text-sm">Scalevo</span>
           </div>
-          <div className="w-9" /> {/* Spacer */}
+          <button
+            onClick={toggle}
+            className="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            <Globe size={12} />
+            {lang === "tr" ? "EN" : "TR"}
+          </button>
         </header>
 
         {/* Page Content */}
