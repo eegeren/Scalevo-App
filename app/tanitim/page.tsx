@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, ReactNode } from "react";
 import {
   Zap, ShoppingBag, BrainCircuit,
   CheckCircle, ArrowRight, Star, Sparkles,
-  Users, Shield, Boxes, Rocket
+  Users, Shield, Boxes, Rocket, Crown
 } from "lucide-react";
 import BrandIcon from "@/components/brand/BrandIcon";
 
@@ -164,7 +164,7 @@ export default function TanitimPage() {
                     ["Trendyol & HB entegrasyonu", true, "Kısıtlı"],
                     ["Başlık & açıklama üretici (AI)", true, false],
                     ["Sipariş / Müşteri / Analiz silme", true, false],
-                    ["Aylık maliyet", "0₺ - 499", "1000₺+"],
+                    ["Aylık maliyet", "0₺ - 899₺", "1000₺+"],
                     ["Kurulum gerektirmez", true, false],
                   ].map(([feat, scalevo, other], i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
@@ -249,13 +249,13 @@ export default function TanitimPage() {
 
       {/* FİYATLANDIRMA */}
       <section id="fiyatlandirma" className="py-24 px-6 bg-slate-50">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Reveal className="text-center mb-14">
             <p className="text-green-600 font-semibold text-sm uppercase tracking-wide mb-3">Fiyatlandırma</p>
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Sade ve şeffaf</h2>
             <p className="text-slate-500 text-lg">Başlamak ücretsiz. Büyüdükçe yükselt.</p>
           </Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Reveal delay={0}>
               <PricingCard title="Ücretsiz" price="0 ₺" period="/ ay" badge=""
                 desc="E-ticarete yeni başlayanlar için temel araçlar."
@@ -263,10 +263,16 @@ export default function TanitimPage() {
                 items={["Aylık 20 AI analizi", "Sipariş yönetimi", "Stok takibi (50 ürün)", "Finans özeti"]} />
             </Reveal>
             <Reveal delay={150}>
-              <PricingCard title="Scale" price="499 ₺" period="/ ay" badge="En Popüler"
-                desc="Büyüyen mağazalar için tam kapsamlı paket."
-                ctaLabel="Scale'e Geç" ctaHref="/kayit" highlighted
-                items={["Sınırsız AI analizi", "Trendyol & Hepsiburada entegrasyon", "Sınırsız stok yönetimi", "AI Araçlar (başlık, fiyat, trend)", "Müşteri yönetimi (CRM)", "Öncelikli destek"]} />
+              <PricingCard title="Pro" price="499 ₺" period="/ ay" badge="Popüler"
+                desc="Büyümeye hazır satıcılar için akıllı araçlar."
+                ctaLabel="Pro'ya Geç" ctaHref="/kayit" highlighted
+                items={["Aylık 100 AI analizi", "Temel AI araçları (başlık, fiyat)", "Müşteri yönetimi (CRM)", "Stok takibi (500 ürün)", "Ürün karşılaştırma", "Hedefler & KPI takibi"]} />
+            </Reveal>
+            <Reveal delay={300}>
+              <PricingCard title="Scalevo Max" price="899 ₺" period="/ ay" badge="En İyi"
+                desc="Tüm güç, sınırsız erişim, tam öncelik."
+                ctaLabel="Max'e Geç" ctaHref="/kayit" isMax
+                items={["Sınırsız AI analizi", "Tüm AI araçları (trend, yorum)", "Rakip fiyat takibi", "Sınırsız stok ürünü", "Pazaryeri entegrasyonu", "Reklam araçları", "Öncelikli destek"]} />
             </Reveal>
           </div>
         </div>
@@ -281,7 +287,7 @@ export default function TanitimPage() {
           </Reveal>
           <div className="space-y-4">
             {[
-              { q: "Gerçekten ücretsiz mi?", a: "Evet. Temel özellikler sonsuza kadar ücretsiz. Sınırsız analiz ve entegrasyonlar için Scale planına geçebilirsin." },
+              { q: "Gerçekten ücretsiz mi?", a: "Evet. Temel özellikler sonsuza kadar ücretsiz. Daha fazla analiz ve özellik için Pro veya Max planına geçebilirsin." },
               { q: "Kredi kartı gerekiyor mu?", a: "Hayır. Ücretsiz plana başlamak için kredi kartı istemiyoruz." },
               { q: "Trendyol API nasıl bağlanır?", a: "Ayarlar → Pazaryeri sekmesinden Trendyol Supplier ID, API Key ve Secret girerek bağlanabilirsin." },
               { q: "Verilerim güvende mi?", a: "Evet. Supabase altyapısı kullanıyoruz, tüm veriler şifreli ve güvende. Üçüncü taraflarla paylaşılmaz." },
@@ -367,26 +373,45 @@ function Step({ number, icon, title, desc }: any) {
   );
 }
 
-function PricingCard({ title, price, period, badge, desc, ctaLabel, ctaHref, items, highlighted = false }: any) {
+function PricingCard({ title, price, period, badge, desc, ctaLabel, ctaHref, items, highlighted = false, isMax = false }: any) {
+  const bgClass = isMax
+    ? "bg-gradient-to-br from-violet-600 to-purple-700 border-violet-600 text-white"
+    : highlighted
+    ? "bg-green-600 border-green-600 text-white"
+    : "bg-white border-slate-200 text-slate-900";
+
+  const subTextClass = isMax ? "text-violet-200" : highlighted ? "text-green-100" : "text-slate-500";
+  const itemTextClass = isMax ? "text-violet-50" : highlighted ? "text-green-50" : "text-slate-600";
+  const checkClass = isMax || highlighted ? "text-white" : "text-green-500";
+  const badgeBg = isMax ? "bg-white text-violet-700" : "bg-slate-900 text-white";
+  const ctaClass = isMax
+    ? "bg-white text-violet-700 hover:bg-violet-50"
+    : highlighted
+    ? "bg-white text-green-700 hover:bg-green-50"
+    : "bg-slate-900 text-white hover:bg-slate-800";
+
   return (
-    <div className={`rounded-2xl border p-8 shadow-sm relative h-full flex flex-col ${highlighted ? "bg-green-600 border-green-600 text-white" : "bg-white border-slate-200 text-slate-900"}`}>
+    <div className={`rounded-2xl border p-8 shadow-sm relative h-full flex flex-col ${bgClass}`}>
       {badge && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full bg-slate-900 text-white">{badge}</span>
+        <span className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full ${badgeBg}`}>{badge}</span>
       )}
-      <p className={`text-sm font-semibold ${highlighted ? "text-green-100" : "text-slate-500"}`}>{title}</p>
-      <div className="mt-3 flex items-end gap-1.5 mb-2">
-        <span className="text-4xl font-extrabold">{price}</span>
-        <span className={`text-sm mb-1 ${highlighted ? "text-green-100" : "text-slate-400"}`}>{period}</span>
+      <div className="flex items-center gap-2 mb-1">
+        {isMax && <Crown size={14} className="text-violet-200" />}
+        <p className={`text-sm font-semibold ${subTextClass}`}>{title}</p>
       </div>
-      <p className={`text-sm leading-relaxed mb-6 ${highlighted ? "text-green-50" : "text-slate-500"}`}>{desc}</p>
+      <div className="mt-2 flex items-end gap-1.5 mb-2">
+        <span className="text-4xl font-extrabold">{price}</span>
+        <span className={`text-sm mb-1 ${subTextClass}`}>{period}</span>
+      </div>
+      <p className={`text-sm leading-relaxed mb-6 ${subTextClass}`}>{desc}</p>
       <ul className="space-y-2.5 mb-7 flex-1">
         {items.map((item: string, i: number) => (
-          <li key={i} className={`flex items-center gap-2 text-sm ${highlighted ? "text-green-50" : "text-slate-600"}`}>
-            <CheckCircle size={14} className={highlighted ? "text-white" : "text-green-500"} /> {item}
+          <li key={i} className={`flex items-center gap-2 text-sm ${itemTextClass}`}>
+            <CheckCircle size={14} className={checkClass} /> {item}
           </li>
         ))}
       </ul>
-      <Link href={ctaHref} className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${highlighted ? "bg-white text-green-700 hover:bg-green-50" : "bg-slate-900 text-white hover:bg-slate-800"}`}>
+      <Link href={ctaHref} className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${ctaClass}`}>
         {ctaLabel} <ArrowRight size={15} />
       </Link>
     </div>
