@@ -127,7 +127,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
       <nav className="space-y-1.5">
         <NavItem href="/" icon={<LayoutDashboard size={18} />} label={t.overview} active={pathname === "/"} />
-        <NavItem href="/analiz" icon={<Search size={18} />} label={t.analysis} active={pathname.startsWith("/analiz")} />
+        <NavItem href="/analiz" icon={<Search size={18} />} label={t.analysis} active={pathname?.startsWith("/analiz") ?? false} />
         <NavItem href="/ai-araclar" icon={<Sparkles size={18} />} label={t.aiTools} active={pathname === "/ai-araclar"} badge="Yeni" />
         <NavItem href="/karsilastir" icon={<Scale size={18} />} label={t.compare} active={pathname === "/karsilastir"} />
         <NavItem href="/operasyonlar" icon={<ShoppingBag size={18} />} label={t.operations} active={pathname === "/operasyonlar"} />

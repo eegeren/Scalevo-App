@@ -100,7 +100,7 @@ export default function AppShell({ children, user }: AppShellProps) {
               {[...DRAWER_NAV, ...(user && ADMIN_EMAILS_SHELL.includes(user.email?.toLowerCase()) ? [{ href: "/admin", icon: ShieldCheck, label: "Admin Paneli", badge: "Admin" }] : [])].map((item) => {
                 const active = item.href === "/"
                   ? pathname === "/"
-                  : pathname.startsWith(item.href);
+                  : (pathname?.startsWith(item.href) ?? false);
                 return (
                   <Link
                     key={item.href}
@@ -188,7 +188,7 @@ export default function AppShell({ children, user }: AppShellProps) {
             {BOTTOM_NAV.map((item) => {
               const active = item.href === "/"
                 ? pathname === "/"
-                : pathname.startsWith(item.href);
+                : (pathname?.startsWith(item.href) ?? false);
               return (
                 <Link
                   key={item.href}

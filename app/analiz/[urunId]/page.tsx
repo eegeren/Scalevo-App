@@ -28,7 +28,7 @@ export default function UrunDetayPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const urlSlug = params.urunId as string;
+  const urlSlug = (params?.urunId as string) || "";
   const productNameFromUrl = decodeURIComponent(urlSlug).replace(/-/g, " ");
 
   useEffect(() => {

@@ -25,8 +25,8 @@ const ROUTE_LABELS: Record<string, string> = {
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isPremiumRoute = PREMIUM_ROUTES.includes(pathname);
-  const featureLabel = ROUTE_LABELS[pathname];
+  const isPremiumRoute = PREMIUM_ROUTES.includes(pathname ?? "");
+  const featureLabel = ROUTE_LABELS[pathname ?? ""];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">

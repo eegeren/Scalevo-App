@@ -24,7 +24,7 @@ export default function PaylasimPage() {
 
   useEffect(() => {
     try {
-      const raw = params.get("d");
+      const raw = params?.get("d");
       if (!raw) { setError(true); return; }
       const decoded = JSON.parse(atob(decodeURIComponent(raw)));
       setData(decoded);
